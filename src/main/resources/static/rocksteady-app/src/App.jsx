@@ -13,6 +13,21 @@ function App() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newHabitTitle, setNewHabitTitle] = useState("");
+    const [dialogue, setDialogue] = useState("Tap me, slacker. Let's see your progress.");
+
+    //Initial rock click dialogue 
+    const handleRockClick = () => {
+    const quotes = [
+            "I'm a literal pebble and my discipline is better than yours.",
+            "Did you finish your tasks, or am I growing weeds tomorrow?",
+            "Streak count is looking okay... keep going!",
+            "Every checked box makes my stone skin radiant.",
+            "Stay focused! Don't let me down."
+        ];
+        const randomIndex = Math.floor(Math.random() * quotes.length);
+        setDialogue(quotes[randomIndex]);
+    };
+
 
     // --- On Launch: Process Time Changes & Recovery/Decay Logic ---
     useEffect(() => {
@@ -114,14 +129,27 @@ function App() {
             </div>
 
             {/* Central Target Pet Rock Layout Wrapper */}
+            
             <div className="rock-area">
-                <div className={`pet-rock ${gameState.moodState}`}>
-                    {gameState.moodState === "HAPPY" && "🪨 Pet Rock"}
-                    {gameState.moodState === "BORED" && "😑 Bored Rock"}
-                    {gameState.moodState === "DEPRESSED" && "🏚️ Sad Rock"}
-                    {gameState.moodState === "CRACKED" && "💥 Cracked!!"}
+                {/* Dynamic Text Speech Box */}
+                <div className="speech-bubble">{dialogue}</div>
+                
+                {/* Animated Character Avatar */}
+                <div 
+                    className={`pet-rock rock-breathing ${gameState.moodState}`} 
+                    onClick={handleRockClick}
+                >
+                    {/* Animated Eyes Component */}
+                    <div className="eyes-container">
+                        <div className="cartoon-eye"></div>
+                        <div className="cartoon-eye"></div>
+                    </div>
+                    
+                    {/* Dynamic Mouth Condition */}
+                    <div className="cartoon-mouth"></div>
                 </div>
             </div>
+
 
             {/* Interactive Habit Section Controls */}
             <div className="habit-header">
