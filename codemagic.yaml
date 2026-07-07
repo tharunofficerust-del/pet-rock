@@ -11,7 +11,7 @@ workflows:
       events:
         - push
       branch_patterns:
-        - target: main
+        - main
     scripts:
       - name: Install Web and Native Core Packages
         script: |
