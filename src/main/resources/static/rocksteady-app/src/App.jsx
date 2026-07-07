@@ -29,7 +29,7 @@ function App() {
     const [tempName, setTempName] = useState("");
     const [isBlinking, setIsBlinking] = useState(false);
     const [isTalking, setIsTalking] = useState(false);
-     const [isJumping, setIsJumping] = useState(false); 
+    const [isJumping, setIsJumping] = useState(false);
 
     const playSound = (soundFileName) => {
         const audio = new Audio(`/sounds/${soundFileName}`);
@@ -89,7 +89,7 @@ function App() {
         setGameState(currentData);
         setTempName(currentData.rockName);
     }, []);
-        // --- 🆕 FIX B: Auto-Refreshes Timer on Rapid Tap Cycles ---
+    // --- 🆕 FIX B: Auto-Refreshes Timer on Rapid Tap Cycles ---
     useEffect(() => {
         setIsDialogueVisible(true);
         const timer = setTimeout(() => {
@@ -217,6 +217,16 @@ function App() {
 
         const randomIndex = Math.floor(Math.random() * quotes.length);
         setDialogue(quotes[randomIndex]);
+
+        const selectedQuote = quotes[randomIndex];
+
+        // 🛡️ SAFETY CHECKER FALLBACK: Catch empty elements instantly
+        if (!selectedQuote || selectedQuote.trim() === "") {
+            setDialogue(`Hey! I'm feeling extra sturdy right now! 🔥`);
+        } else {
+            setDialogue(selectedQuote);
+        }
+
     };
 
 
@@ -263,99 +273,159 @@ function App() {
                 </div>
             </div>
             {/* Central Gaming View Deck Panel Screen */}
+            {/* Central Gaming View Deck Panel Screen Matrix */}
             <div className="rock-area">
-                <div className={`speech-bubble ${isDialogueVisible ? 'fade-in' : 'fade-out'}`}>{dialogue}</div>
 
-                <AnimatePresence mode="wait">
-                    {gameState.moodState === "CRACKED" ? (
-                        /* 👻 STATE 4 DESIGN: GHOST ASCENSION WITH SMOOTH TRANSITIONS */
-                        <motion.div
-                            key="ghost-view" className="ghost-stage-wrapper"
-                            initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
-                            transition={{ type: "spring", bounce: 0.4 }}
-                        >
-                            <div className="broken-rock-shell"><div className="shell-crack-line"></div></div>
+                {/* 🔒 1. PERMANENT RESPONSIVE DIALOGUE TRACK LAYER */}
+                <div className="dialogue-zone-wrapper">
+                    <AnimatePresence mode="popLayout">
+                        {isDialogueVisible && (
                             <motion.div
-                                className="ghost-character ghost-float-anim" onClick={handleRockClick}
-                                whileTap={{ scale: 0.93, y: 5 }}
+                                key={dialogue}
+                                className="speech-bubble"
+                                initial={{ scale: 0, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0, opacity: 0 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                                style={{ transformOrigin: "bottom center" }}
                             >
-                                <div className="ghost-tail"></div>
-                                <div className="ghost-eyes-container">
-                                    <div className="ghost-cross-eye">✕</div>
-                                    <div className="ghost-cross-eye">✕</div>
-                                </div>
-                                <div className="ghost-wavy-mouth"></div>
+                                {dialogue}
                             </motion.div>
-                        </motion.div>
-                    ) : (
-                        /* 🪨 STATES 1-3 DESIGN: SINGLE-MESH MOTION INTERFACE WITH ZERO DUPLICATIONS */
-                        <motion.div
-                            key="rock-view"
-                            className={`pet-rock color-${gameState.rockColor} ${gameState.moodState} ${isTalking ? 'talking-mouth-anim' : ''} ${isJumping ? 'jump-active-anim' : ''}`}
-                            onClick={handleRockClick}
-                            animate={{
-                                y: [0, -4, 0],
-                                scaleX: [1, 1.03, 1],
-                                scaleY: [1, 0.97, 1]
-                            }}
-                            transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                            whileHover={{ scale: 1.04 }}
-                            whileTap={{ scale: 0.85, scaleY: 0.7, scaleX: 1.25, rotate: 2 }}
-                        >
-                            {gameState.accessory === "NONE" && (
-                                <div className="rock-accessory sprout-leaves-asset">
-                                    <svg width="60" height="35" viewBox="0 0 60 35">
-                                        <path d="M30,35 L30,22" stroke="#000000" strokeWidth="4" strokeLinecap="round" />
-                                        <path d="M30,22 C15,12 10,24 5,16 C10,4 25,12 30,22 Z" fill="#26E65B" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
-                                        <path d="M30,22 C45,12 50,24 55,16 C50,4 35,12 30,22 Z" fill="#26E65B" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* 🔒 2. PERMANENT RESPONSIVE PET ROCK CANVAS LAYER */}
+                <div className="character-zone-wrapper">
+                    <AnimatePresence mode="wait">
+                        {gameState.moodState === "CRACKED" ? (
+                            /* 👻 STATE 4 DESIGN: THE FLOATING GHOST SPIRIT VIEWPORT (Fires under 15% HP) */
+                            <motion.div
+                                key="ghost-view" className="ghost-stage-wrapper"
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.8, opacity: 0 }}
+                                transition={{ type: "spring", bounce: 0.4 }}
+                            >
+                                <div className="broken-rock-shell">
+                                    <div className="shell-crack-line"></div>
+                                </div>
+                                <motion.div
+                                    className="ghost-character ghost-float-anim"
+                                    onClick={handleRockClick}
+                                    whileTap={{ scale: 0.93, y: 5 }}
+                                >
+                                    <div className="ghost-tail"></div>
+                                    <div className="ghost-eyes-container">
+                                        <div className="ghost-cross-eye">✕</div>
+                                        <div className="ghost-cross-eye">✕</div>
+                                    </div>
+                                    <div className="ghost-wavy-mouth"></div>
+                                </motion.div>
+                            </motion.div>
+                        ) : (
+                            /* 🪨 STATES 1-3 DESIGN: SINGLE-MESH MOTION INTERFACE WITH PERFECT ACCESSORIES ORDER */
+                            <motion.div
+                                key="rock-view"
+                                className={`pet-rock color-${gameState.rockColor} ${gameState.moodState} ${isTalking ? 'talking-mouth-anim' : ''} ${isJumping ? 'jump-active-anim' : ''}`}
+                                onClick={handleRockClick}
+                                animate={{
+                                    y: [0, -4, 0],
+                                    scaleX: [1, 1.03, 1],
+                                    scaleY: [1, 0.97, 1]
+                                }}
+                                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                                whileHover={{ scale: 1.04 }}
+                                whileTap={{ scale: 0.85, scaleY: 0.7, scaleX: 1.25, rotate: 2 }}
+                            >
+                                {/* 👑 1. ACCESSORIES LAYER (PLACED FIRST AT THE TOP OF THE MESH) */}
+                                {gameState.accessory === "NONE" && (
+                                    <div className="rock-accessory sprout-leaves-asset">
+                                        <svg width="60" height="35" viewBox="0 0 60 35">
+                                            <path d="M30,35 L30,22" stroke="#000000" strokeWidth="4" strokeLinecap="round" />
+                                            <path d="M30,22 C15,12 10,24 5,16 C10,4 25,12 30,22 Z" fill="#26E65B" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
+                                            <path d="M30,22 C45,12 50,24 55,16 C50,4 35,12 30,22 Z" fill="#26E65B" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
+                                        </svg>
+                                    </div>
+                                )}
+
+                                {gameState.accessory === "CROWN" && (
+                                    <svg className="rock-accessory crown-asset" width="56" height="42" viewBox="0 0 24 24" version="1.1">
+                                        <path d="M2,19 L22,19 L20,7 L16,12 L12,4 L8,12 L4,7 Z" fill="#000" />
+                                        <path d="M3,18 L21,18 L19,8 L15,13 L12,5 L9,13 L5,8 Z" fill="#FFD500" stroke="#000" strokeWidth="2.5" strokeLinejoin="round" />
+                                        <circle cx="12" cy="5" r="1.5" fill="#FF52C1" stroke="#000" strokeWidth="1" />
+                                        <circle cx="5" cy="8" r="1.5" fill="#00E5FF" stroke="#000" strokeWidth="1" />
+                                        <circle cx="19" cy="8" r="1.5" fill="#00E5FF" stroke="#000" strokeWidth="1" />
                                     </svg>
-                                </div>
-                            )}
+                                )}
 
-                            {gameState.healthPoints <= 80 && (
-                                <div className="rock-fracture-cracks">
-                                    <svg width="125" height="115" viewBox="0 0 125 115" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-                                        <path d="M15,25 L30,32 L24,45" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
-                                        <path d="M105,95 L92,80 L98,68 L88,60" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
+                                {gameState.accessory === "HAT" && (
+                                    <svg className="rock-accessory hat-asset" width="55" height="42" viewBox="0 0 24 24" version="1.1">
+                                        <path d="M4,18 C4,15 5,15 6,15 L6,6 L17,6 L17,15 C19,15 21,15 21,18 Z" fill="#111" stroke="#000" strokeWidth="2.5" strokeLinejoin="round" />
+                                        <path d="M6,14 L18,14" stroke="#FF52C1" strokeWidth="3.5" strokeLinecap="round" />
                                     </svg>
+                                )}
+
+                                {gameState.accessory === "PARTY" && (
+                                    <svg className="rock-accessory party-asset" width="55" height="55" viewBox="0 0 24 24" version="1.1">
+                                        <path d="M12,1 L2.5,19.5 L21.5,19.5 Z" fill="#000000" />
+                                        <path d="M12,2 L3,19 L21,19 Z" fill="#FF52C1" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round" />
+                                        <path d="M6.5,13 L14.5,7" stroke="#FFD500" strokeWidth="3" strokeLinecap="round" />
+                                        <path d="M9.5,17 L18,11" stroke="#00E5FF" strokeWidth="3" strokeLinecap="round" />
+                                        <circle cx="12" cy="2" r="3" fill="#FFD500" stroke="#000000" strokeWidth="2.5" />
+                                    </svg>
+                                )}
+
+                                {gameState.accessory === "GLASSES" && (
+                                    <div className="premium-glasses-rig">
+                                        <svg width="106" height="36" viewBox="0 0 106 36"><rect x="25" y="11" width="56" height="6" fill="#000000" rx="3" /><circle cx="23" cy="17" r="16" fill="#000000" /><circle cx="23" cy="17" r="12" fill="#111111" /><path d="M15,14 C19,10 23,12 25,15" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" fill="none" /><circle cx="83" cy="17" r="16" fill="#000000" /><circle cx="83" cy="17" r="12" fill="#111111" /><path d="M75,14 C79,10 83,12 85,15" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" fill="none" /></svg>
+                                    </div>
+                                )}
+
+                                {/* 👀 2. FACE LAYER (PLACED UNDERNEATH ACCESSORIES) */}
+                                <div className="rock-blush blush-left"></div>
+                                <div className="rock-blush blush-right"></div>
+
+                                <div className="eyes-container">
+                                    <div className="cartoon-eye"><div className="cartoon-eye-glint-two"></div></div>
+                                    <div className="cartoon-eye"><div className="cartoon-eye-glint-two"></div></div>
                                 </div>
-                            )}
 
-                            {gameState.healthPoints <= 50 && (
-                                <>
-                                    <div className="hospital-ice-pack"><svg width="40" height="25" viewBox="0 0 40 25"><ellipse cx="20" cy="15" rx="16" ry="8" fill="#00E5FF" stroke="#000" strokeWidth="2.5" /><path d="M20,7 L20,2" stroke="#000" strokeWidth="3" /><circle cx="20" cy="2" r="2" fill="#000" /></svg></div>
-                                    <div className="hospital-blanket"><div className="blanket-fold-line"></div><span className="medical-cross-symbol">＋</span></div>
-                                    <div className="hospital-thermometer"></div>
-                                </>
-                            )}
+                                <div className="cartoon-mouth"></div>
+                                {/* 💤 ANIME SLACKER SLEEPY BUBBLE EFFECT (Fires only during BORED state) */}
+                                {gameState.moodState === "BORED" && (
+                                    <div className="anime-sleepy-bubble">
+                                        <svg width="40" height="40" viewBox="0 0 40 40">
+                                            <circle cx="20" cy="20" r="16" fill="#A0F4FF" stroke="#000" strokeWidth="3" />
+                                            <path d="M12,12 C15,9 18,9 20,10" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                                        </svg>
+                                        <span className="sleepy-zzz-tag">Z</span>
+                                    </div>
+                                )}
 
-                            <div className="rock-blush blush-left"></div>
-                            <div className="rock-blush blush-right"></div>
-                            <div className="eyes-container">
-                                <div className="cartoon-eye"><div className="cartoon-eye-glint-two"></div></div>
-                                <div className="cartoon-eye"><div className="cartoon-eye-glint-two"></div></div>
-                            </div>
-                            <div className="cartoon-mouth"></div>
+                                {/* ⚡ HEALTH CONDITION EXPRESSION OVERLAYS */}
+                                {gameState.healthPoints <= 80 && (
+                                    <div className="rock-fracture-cracks">
+                                        <svg width="125" height="115" viewBox="0 0 125 115" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+                                            <path d="M15,25 L30,32 L24,45" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
+                                            <path d="M105,95 L92,80 L98,68 L88,60" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
+                                        </svg>
+                                    </div>
+                                )}
 
-                            {gameState.moodState === "BORED" && (
-                                <div className="anime-sleepy-bubble">
-                                    <svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="#A0F4FF" stroke="#000" strokeWidth="3" /><path d="M12,12 C15,9 18,9 20,10" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" fill="none" /></svg>
-                                    <span className="sleepy-zzz-tag">Z</span>
-                                </div>
-                            )}
-
-                            {gameState.accessory === "CROWN" && <svg className="rock-accessory crown-asset" width="56" height="42" viewBox="0 0 24 24"><path d="M2,19 L22,19 L20,8 L16,13 L12,5 L8,13 L4,8 Z" fill="#000" /><path d="M3,18 L21,18 L19,8 L15,13 L12,5 L9,13 L5,8 Z" fill="#FFD500" stroke="#000" strokeWidth="2.5" strokeLinejoin="round" /><circle cx="12" cy="5" r="1.5" fill="#FF52C1" stroke="#000" strokeWidth="1" /><circle cx="5" cy="8" r="1.5" fill="#00E5FF" stroke="#000" strokeWidth="1" /><circle cx="19" cy="8" r="1.5" fill="#00E5FF" stroke="#000" strokeWidth="1" /></svg>}
-                            {gameState.accessory === "HAT" && <svg className="rock-accessory hat-asset" width="55" height="42" viewBox="0 0 24 24"><path d="M4,18 C4,15 5,15 6,15 L6,6 L17,6 L17,15 C19,15 21,15 21,18 Z" fill="#111" stroke="#000" strokeWidth="2.5" strokeLinejoin="round" /><path d="M6,14 L18,14" stroke="#FF52C1" strokeWidth="3.5" strokeLinecap="round" /></svg>}
-                            {gameState.accessory === "PARTY" && <svg className="rock-accessory party-asset" width="55" height="55" viewBox="0 0 24 24"><path d="M12,1 L2.5,19.5 L21.5,19.5 Z" fill="#000000" /><path d="M12,2 L3,19 L21,19 Z" fill="#FF52C1" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round" /><circle cx="12" cy="2" r="3" fill="#FFD500" stroke="#000000" strokeWidth="2.5" /></svg>}
-                            {gameState.accessory === "GLASSES" && (
-                                <div className="premium-glasses-rig">
-                                    <svg width="106" height="36" viewBox="0 0 106 36"><rect x="25" y="11" width="56" height="6" fill="#000000" rx="3" /><circle cx="23" cy="17" r="16" fill="#000000" /><circle cx="23" cy="17" r="12" fill="#111111" /><path d="M15,14 C19,10 23,12 25,15" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" fill="none" /><circle cx="83" cy="17" r="16" fill="#000000" /><circle cx="83" cy="17" r="12" fill="#111111" /><path d="M75,14 C79,10 83,12 85,15" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" fill="none" /></svg>
-                                </div>
-                            )}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                                {gameState.healthPoints <= 50 && (
+                                    <>
+                                        <div className="hospital-ice-pack"><svg width="40" height="25" viewBox="0 0 40 25"><ellipse cx="20" cy="15" rx="16" ry="8" fill="#00E5FF" stroke="#000" strokeWidth="2.5" /><path d="M20,7 L20,2" stroke="#000" strokeWidth="3" /><circle cx="20" cy="2" r="2" fill="#000" /></svg></div>
+                                        <div className="hospital-blanket"><div className="blanket-fold-line"></div><span className="medical-cross-symbol">＋</span></div>
+                                        <div className="hospital-thermometer"></div>
+                                    </>
+                                )}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
             </div>
+
             {/* --- Core Routing Tabs View Switcher Block --- */}
             {activeTab === "HOME" && (
                 <>
@@ -412,11 +482,29 @@ function App() {
             )}
             {activeTab === "ABOUT" && (
                 <div className="subview-panel-container">
-                    <h3>ABOUT</h3>
-                    <p className="about-body-text"><strong>Rocksteady</strong> is a local-first, privacy-focused utility built with Vite React wrapped inside Capacitor cross-platform plugins.</p>
-                    <span className="version-tag">Version 1.0.0 (Build 2026)</span>
+                    <h3>ABOUT PET PEBBLE 🪨</h3>
+                    <p className="about-body-text" style={{ marginBottom: '10px' }}>
+                        <strong>Pet Pebble</strong> is a high-discipline accountability game designed to keep your habits rock-solid!
+                    </p>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '10px', borderTop: '2px dashed #000', paddingTop: '8px' }}>
+                    <div style={{ textAlign: 'left', background: '#000000', color: '#FFF', padding: '12px', borderRadius: '16px', border: '3px solid #000', boxShadow: '4px 4px 0px #FF52C1', marginBottom: '14px' }}>
+                        <span style={{ fontFamily: 'Lexend Mega', fontSize: '0.65rem', fontWeight: 900, color: '#FFD500', display: 'block', marginBottom: '6px' }}>🎮 HOW TO PLAY:</span>
+                        <ul style={{ paddingLeft: '16px', fontFamily: 'Fredoka', fontSize: '0.8rem', lineHeight: '1.4', listStyleType: 'square' }}>
+                            <li>Add up to <strong>5 custom habits</strong> on the home tab.</li>
+                            <li>Check them off daily to fuel your pebble's <strong>Mineral Energy</strong>.</li>
+                            <li>Leave tasks incomplete past midnight, and your pebble takes <strong>Heavy Fracture Damage</strong>!</li>
+                            <li>Keep a perfect streak alive to dress your pebble up in rare, premium accessories.</li>
+                        </ul>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', borderTop: '3px solid #000', paddingTop: '10px', marginTop: 'auto' }}>
+                        <span style={{ fontFamily: 'Lexend Mega', fontSize: '0.65rem', fontWeight: 900, color: '#00E5FF' }}>DESIGNED & DEVELOPED BY:</span>
+                        <strong style={{ fontFamily: 'Lexend Mega', fontSize: '0.9rem', fontWeight: 900, color: '#000' }}>THARUN VIJAY 🚀</strong>
+                        <span className="version-tag" style={{ marginTop: '4px' }}>Version 1.0.0 (Build 2026)</span>
+                    </div>
+
+                    {/* 🛠️ INTEGRATED LIVE HEALTH STATE TEST PANEL */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '12px', borderTop: '2px dashed #000', paddingTop: '8px' }}>
                         <span style={{ fontSize: '0.55rem', fontFamily: 'Lexend Mega', fontWeight: 900 }}>TAP TO TEST VISUAL STAGES:</span>
                         <div style={{ display: 'flex', gap: '4px' }}>
                             <button type="button" style={{ padding: '6px 4px', fontSize: '0.65rem', flex: 1, fontFamily: 'Fredoka', fontWeight: 700, cursor: 'pointer' }} onClick={() => updateGameSetting('healthPoints', 100)}>100 (Happy)</button>
@@ -427,6 +515,7 @@ function App() {
                     </div>
                 </div>
             )}
+
 
             {isModalOpen && (
                 <div className="modal-overlay">
