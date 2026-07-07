@@ -317,19 +317,25 @@ body {
 
 /* --- 🛠️ 100% Fixed Facial Blending Blush Effect --- */
 /* --- 🛠️ 100% Fixed Dual Cartoon Cheek Blush (No Layout Bleeding) --- */
-.pet-rock::before {
-    content: ''; 
+/* --- 🛠️ 100% Perfect Dual Cartoon Cheek Elements (Zero Bleeding) --- */
+.rock-blush {
     position: absolute;
-    width: 14px; 
+    width: 14px;
     height: 14px;
     background: #FF7B9C !important; /* Soft premium pastel rose pink from our theme */
     border: 3.5px solid #000000;
-    border-radius: 50%; /* Perfect round cheek circle unit */
-    top: 54px; 
-    left: 20px; /* Positions perfectly right below the left eye */
-    z-index: 1; 
-    /* Dual placement trick: Use a box-shadow to stamp a matching right cheek circle instantly! */
-    box-shadow: 62px 0px 0px #FF7B9C, 62px 0px 0px 0px #000000;
+    border-radius: 50%;
+    top: 54px;
+    z-index: 1; /* Pushes blush deep underneath eyes and mouth layers safely */
+}
+
+/* Absolute spatial placement coordinates matching face layout lines */
+.blush-left {
+    left: 20px;
+}
+
+.blush-right {
+    right: 20px;
 }
 
 
@@ -791,3 +797,19 @@ body {
     border: 2px solid #000000;
     box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
 }
+
+/* --- New Custom Accessories Placements --- */
+.party-asset {
+    top: -30px;        /* Pulls it slightly lower onto the stone surface */
+    left: 40px;        /* Horizontal alignment matching the crown/hat profile */
+    z-index: 10;
+    filter: drop-shadow(4px 4px 0px #000000); /* Neo-brutalist cartoon shadow profile */
+}
+
+.glasses-asset {
+    top: 24px;         /* Keeps the vertical position sitting cleanly on the eyes */
+    left: 26px;        /* 🛠️ Shifts it 4 pixels to the right to center perfectly */
+    z-index: 25;
+    filter: drop-shadow(4px 4px 0px #000000);
+}
+

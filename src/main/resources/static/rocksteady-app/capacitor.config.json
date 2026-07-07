@@ -1,0 +1,8 @@
+{
+  "appId": "com.accountability.petrock",
+  "appName": "Rocksteady",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

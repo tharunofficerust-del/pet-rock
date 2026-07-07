@@ -10,7 +10,10 @@ function App() {
         streakCount: 0,
         lastCheckInDate: new Date().toISOString().split('T')[0],
         habits: [],
-        hasNamedRock: false
+        hasNamedRock: false,
+        difficulty: "NORMAL",
+        rockColor: "ORANGE",
+        accessory: "NONE"
     });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,28 +22,25 @@ function App() {
     const [dialogue, setDialogue] = useState("Tap me, slacker. Let's see your progress.");
     const [isDialogueVisible, setIsDialogueVisible] = useState(true);
 
-    // --- Expression, Layout Tabs, and Custom Customization Hooks ---
-    const [activeTab, setActiveTab] = useState("HOME"); // HOME, SETTINGS, ABOUT
-    const [difficulty, setDifficulty] = useState("NORMAL"); // EASY, NORMAL, HARDCORE
-    const [rockColor, setRockColor] = useState("ORANGE");   // ORANGE, NEON_BLUE, GOLD
-    const [accessory, setAccessory] = useState("NONE");     // NONE, CROWN, HAT
+    // --- Expression, Navigation, and Live Feedback State Hooks ---
+    const [activeTab, setActiveTab] = useState("HOME");
     const [isEditingName, setIsEditingName] = useState(false);
     const [tempName, setTempName] = useState("");
     const [isBlinking, setIsBlinking] = useState(false);
     const [isTalking, setIsTalking] = useState(false);
     const [isJumping, setIsJumping] = useState(false);
 
-    // --- Built-in Offline HTML5 Sound Constructor Engine ---
+    // --- Native HTML5 Local Audio Sound Playback Engine ---
     const playSound = (soundFileName) => {
         const audio = new Audio(`/sounds/${soundFileName}`);
         audio.volume = 0.4;
         audio.play().catch(() => console.log("Audio waiting for user-tap interaction layer activation"));
     };
-
-    // --- On Launch: Process Time & Local Storage Updates ---
+    // --- Lifecycle Handler: Evaluates Storage, Time Decay, and Fail-safes ---
     useEffect(() => {
         const saved = localStorage.getItem("ROCKSTEADY_DATA");
         const todayStr = new Date().toISOString().split('T')[0];
+
         let currentData = saved ? JSON.parse(saved) : {
             rockName: "Rocky",
             healthPoints: 100,
@@ -48,8 +48,16 @@ function App() {
             streakCount: 0,
             lastCheckInDate: todayStr,
             habits: [],
-            hasNamedRock: false
+            hasNamedRock: false,
+            difficulty: "NORMAL",
+            rockColor: "ORANGE",
+            accessory: "NONE"
         };
+
+        // Inject default properties for existing data caches
+        if (currentData.difficulty === undefined) currentData.difficulty = "NORMAL";
+        if (currentData.rockColor === undefined) currentData.rockColor = "ORANGE";
+        if (currentData.accessory === undefined) currentData.accessory = "NONE";
 
         if (!currentData.hasNamedRock) {
             setIsFirstTimeModalOpen(true);
@@ -61,11 +69,10 @@ function App() {
             const missed = total - completed;
 
             if (missed > 0) {
-                // Apply penalty weight based on current active difficulty state multiplier
-                const weight = difficulty === "EASY" ? 10 : (difficulty === "HARDCORE" ? 30 : 20);
+                const weight = currentData.difficulty === "EASY" ? 10 : (currentData.difficulty === "HARDCORE" ? 30 : 20);
                 currentData.healthPoints = Math.max(0, currentData.healthPoints - (missed * weight));
                 currentData.streakCount = 0;
-                playSound('damage.mp3'); // Plays crunch damage audio alert
+                playSound('damage.mp3');
             } else if (total > 0 && missed === 0) {
                 currentData.streakCount += 1;
                 currentData.healthPoints = Math.min(100, currentData.healthPoints + 15);
@@ -83,9 +90,7 @@ function App() {
         localStorage.setItem("ROCKSTEADY_DATA", JSON.stringify(currentData));
         setGameState(currentData);
         setTempName(currentData.rockName);
-    }, [difficulty]);
-
-    // --- Speech Text Fading System ---
+    }, []);
     useEffect(() => {
         setIsDialogueVisible(true);
         const timer = setTimeout(() => {
@@ -94,7 +99,6 @@ function App() {
         return () => clearTimeout(timer);
     }, [dialogue]);
 
-    // --- Autonomous Eye Blinking Loop ---
     useEffect(() => {
         const blinkInterval = setInterval(() => {
             setIsBlinking(true);
@@ -107,26 +111,28 @@ function App() {
         localStorage.setItem("ROCKSTEADY_DATA", JSON.stringify(updatedState));
         setGameState(updatedState);
     };
+
+    const updateGameSetting = (key, value) => {
+        const updated = { ...gameState, [key]: value };
+        saveState(updated);
+    };
+
     const toggleHabit = (id) => {
         const habitToToggle = gameState.habits.find(h => h.id === id);
-
         if (habitToToggle && !habitToToggle.isCompletedToday) {
-            playSound('success.mp3'); // Play high-chime victory reward audio
-
+            playSound('success.mp3');
             confetti({
                 particleCount: 80,
                 spread: 60,
                 origin: { y: 0.65 },
                 colors: ['#FF94E8', '#5CE1E6', '#FFDE4D', '#B6FFA1']
             });
-
             setIsJumping(true);
             setTimeout(() => setIsJumping(false), 600);
             setDialogue("YAY! High discipline energy right there!");
         } else {
             playSound('tap.mp3');
         }
-
         const updatedHabits = gameState.habits.map(h =>
             h.id === id ? { ...h, isCompletedToday: !h.isCompletedToday } : h
         );
@@ -146,33 +152,22 @@ function App() {
             alert("Maximum limit of 5 habits reached!");
             return;
         }
-
         playSound('tap.mp3');
-        const newHabit = {
-            id: Date.now(),
-            title: newHabitTitle,
-            isCompletedToday: false
-        };
-
-        saveState({
-            ...gameState,
-            habits: [...gameState.habits, newHabit]
-        });
+        const newHabit = { id: Date.now(), title: newHabitTitle, isCompletedToday: false };
+        saveState({ ...gameState, habits: [...gameState.habits, newHabit] });
         setNewHabitTitle("");
         setIsModalOpen(false);
     };
-
     const handleRockClick = () => {
-        playSound('squish.mp3'); // Play squishy clay speech bubble sound
+        playSound('squish.mp3');
         setIsTalking(true);
         setTimeout(() => setIsTalking(false), 1200);
-
         const quotes = [
             `Hey! Gentle with the clicks, human!`,
             `My name is ${gameState.rockName}. Use settings to dress me up!`,
             `Daily streak is looking sweet at ${gameState.streakCount}!`,
             `Every checked box fuels my mineral power!`,
-            `Current difficulty mode is set to ${difficulty}. Keep pushing!`
+            `Current difficulty mode is set to ${gameState.difficulty}. Keep pushing!`
         ];
         const randomIndex = Math.floor(Math.random() * quotes.length);
         setDialogue(quotes[randomIndex]);
@@ -188,19 +183,13 @@ function App() {
             setDialogue(`Awesome! My name is now officially ${tempName.trim()}!`);
         }
     };
+
     return (
         <div className="app-container">
-            {/* Top Header Row Controls */}
             <div className="header-bar">
                 {isEditingName ? (
                     <div className="name-edit-box">
-                        <input
-                            className="inline-name-input"
-                            value={tempName}
-                            onChange={(e) => setTempName(e.target.value)}
-                            maxLength={12}
-                            autoFocus
-                        />
+                        <input className="inline-name-input" value={tempName} onChange={(e) => setTempName(e.target.value)} maxLength={12} autoFocus />
                         <button className="inline-save-btn" onClick={saveNewName}>✓</button>
                     </div>
                 ) : (
@@ -212,44 +201,65 @@ function App() {
                 <div className="streak-badge">🔥 {gameState.streakCount}</div>
             </div>
 
-            {/* Metric Loader Health tracking header track */}
             <div className="health-container">
                 <label>HEALTH TRACKER ({gameState.healthPoints}%)</label>
                 <div className="health-bar-bg">
                     <div className="health-bar-fill" style={{ width: `${gameState.healthPoints}%` }}></div>
                 </div>
             </div>
-
-            {/* Central Gaming Shell Board character deck layout panel */}
             <div className="rock-area">
-                <div className={`speech-bubble ${isDialogueVisible ? 'fade-in' : 'fade-out'}`}>
-                    {dialogue}
-                </div>
+                <div className={`speech-bubble ${isDialogueVisible ? 'fade-in' : 'fade-out'}`}>{dialogue}</div>
+                <div className={`pet-rock ${gameState.moodState} color-${gameState.rockColor} ${isTalking ? 'talking-mouth-anim' : ''} ${isJumping ? 'jump-active-anim' : 'rock-breathing-idle'}`} onClick={handleRockClick}>
 
-                <div
-                    className={`pet-rock 
-                        ${gameState.moodState} color-${rockColor}
-                        ${isTalking ? 'talking-mouth-anim' : ''} 
-                        ${isJumping ? 'jump-active-anim' : 'rock-breathing-idle'}
-                    `}
-                    onClick={handleRockClick}
-                >
-                    {/* 👑 High-Fidelity Vector-Based Custom Accessories Art Overlay */}
-                    {accessory === "CROWN" && (
-                        <svg className="rock-accessory crown-asset" width="50" height="40" viewBox="0 0 24 24" version="1.1">
+                    {gameState.accessory === "CROWN" && (
+                        <svg className="rock-accessory crown-asset" width="50" height="40" viewBox="0 0 24 24">
                             <path d="M2,19 L22,19 L20,8 L16,13 L12,5 L8,13 L4,8 Z" fill="#FFD166" stroke="#000" strokeWidth="2.5" strokeLinejoin="round" />
-                            <circle cx="12" cy="4" r="1.5" fill="#FF7B9C" stroke="#000" strokeWidth="1.5" />
-                            <circle cx="3.5" cy="7.5" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1.5" />
-                            <circle cx="20.5" cy="7.5" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1.5" />
+                            <circle cx="12" cy="4" r="1.5" fill="#FF7B9C" stroke="#000" strokeWidth="1.5" /><circle cx="3.5" cy="7.5" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1.5" /><circle cx="20.5" cy="7.5" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1.5" />
                         </svg>
                     )}
-                    {accessory === "HAT" && (
-                        <svg className="rock-accessory hat-asset" width="50" height="40" viewBox="0 0 24 24" version="1.1">
+                    {gameState.accessory === "HAT" && (
+                        <svg className="rock-accessory hat-asset" width="50" height="40" viewBox="0 0 24 24">
                             <path d="M4,18 C4,15 6,15 7,15 L7,6 C7,5 8,4 10,4 L14,4 C16,4 17,5 17,6 L17,15 C18,15 20,15 20,18 C20,19.5 18,20 12,20 C6,20 4,19.5 4,18 Z" fill="#111111" stroke="#000" strokeWidth="2" strokeLinejoin="round" />
-                            <path d="M7,14 L17,14" stroke="#FF7B9C" strokeWidth="3" strokeLinecap="round" /> {/* Fun Pink Ribbon accent */}
+                            <path d="M7,14 L17,14" stroke="#FF7B9C" strokeWidth="3" strokeLinecap="round" />
+                        </svg>
+                    )}
+                    {gameState.accessory === "PARTY" && (
+                        <svg className="rock-accessory party-asset" width="55" height="55" viewBox="0 0 24 24">
+                            {/* Bold black shadow backing block */}
+                            <path d="M12,1 L2.5,19.5 L21.5,19.5 Z" fill="#000000" />
+                            {/* Main Cone Base */}
+                            <path d="M12,2 L3,19 L21,19 Z" fill="#FF94E8" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round" />
+                            {/* Vibrant Comic Stripes */}
+                            <path d="M6.5,13 L14.5,7" stroke="#FFDE4D" strokeWidth="3" strokeLinecap="round" />
+                            <path d="M9.5,17 L18,11" stroke="#5CE1E6" strokeWidth="3" strokeLinecap="round" />
+                            {/* Fluffy Pom-Pom Puff Ball Top */}
+                            <circle cx="12" cy="2" r="3" fill="#FFDE4D" stroke="#000000" strokeWidth="2.5" />
                         </svg>
                     )}
 
+                    {gameState.accessory === "GLASSES" && (
+                        <svg className="rock-accessory glasses-asset" width="90" height="30" viewBox="0 0 90 30" version="1.1">
+                            {/* Bold black structural connecting bridge frame line */}
+                            <rect x="25" y="8" width="40" height="5" fill="#000000" />
+
+                            {/* Left Round Cartoon Lens Layer */}
+                            <circle cx="20" cy="15" r="14" fill="#000000" />
+                            <circle cx="20" cy="15" r="11" fill="#111111" />
+                            {/* Left Lens Glass Glare Streak */}
+                            <path d="M14,11 L22,7" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
+
+                            {/* Right Round Cartoon Lens Layer */}
+                            <circle cx="70" cy="15" r="14" fill="#000000" />
+                            <circle cx="70" cy="15" r="11" fill="#111111" />
+                            {/* Right Lens Glass Glare Streak */}
+                            <path d="M64,11 L72,7" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
+                        </svg>
+                    )}
+
+
+
+                    <div className="rock-blush blush-left"></div>
+                    <div className="rock-blush blush-right"></div>
 
                     <div className="eyes-container">
                         <div className={`cartoon-eye ${isBlinking ? 'blink-active' : ''}`}></div>
@@ -259,16 +269,12 @@ function App() {
                 </div>
             </div>
 
-            {/* --- Core Routing Tabs View Switcher Block --- */}
             {activeTab === "HOME" && (
                 <>
                     <div className="habit-header">
                         <span>HABITS MAPPED ({gameState.habits.length}/5)</span>
-                        <button className="add-btn" onClick={() => setIsModalOpen(true)} disabled={gameState.habits.length >= 5}>
-                            + ADD
-                        </button>
+                        <button className="add-btn" onClick={() => setIsModalOpen(true)} disabled={gameState.habits.length >= 5}>+ ADD</button>
                     </div>
-
                     <div className="habit-list">
                         {gameState.habits.map(h => (
                             <div className="habit-item" key={h.id}>
@@ -284,66 +290,49 @@ function App() {
                     </div>
                 </>
             )}
-
             {activeTab === "SETTINGS" && (
                 <div className="subview-panel-container">
                     <h3>SETTINGS</h3>
-
                     <div className="setting-section-box">
                         <span className="setting-label">DIFFICULTY DECAY RATE</span>
                         <div className="setting-pill-row">
-                            <button className={`pill-opt ${difficulty === 'EASY' ? 'selected' : ''}`} onClick={() => { setDifficulty('EASY'); playSound('tap.mp3'); }}>Easy</button>
-                            <button className={`pill-opt ${difficulty === 'NORMAL' ? 'selected' : ''}`} onClick={() => { setDifficulty('NORMAL'); playSound('tap.mp3'); }}>Normal</button>
-                            <button className={`pill-opt ${difficulty === 'HARDCORE' ? 'selected' : ''}`} onClick={() => { setDifficulty('HARDCORE'); playSound('tap.mp3'); }}>Hard</button>
+                            <button className={`pill-opt ${gameState.difficulty === 'EASY' ? 'selected' : ''}`} onClick={() => updateGameSetting('difficulty', 'EASY')}>Easy</button>
+                            <button className={`pill-opt ${gameState.difficulty === 'NORMAL' ? 'selected' : ''}`} onClick={() => updateGameSetting('difficulty', 'NORMAL')}>Normal</button>
+                            <button className={`pill-opt ${gameState.difficulty === 'HARDCORE' ? 'selected' : ''}`} onClick={() => updateGameSetting('difficulty', 'HARDCORE')}>Hard</button>
                         </div>
                     </div>
-
                     <div className="setting-section-box">
                         <span className="setting-label">ROCK THEME COLOR</span>
                         <div className="setting-pill-row">
-                            <button className={`pill-opt ${rockColor === 'ORANGE' ? 'selected' : ''}`} onClick={() => { setRockColor('ORANGE'); playSound('tap.mp3'); }}>Orange</button>
-                            <button className={`pill-opt ${rockColor === 'NEON_BLUE' ? 'selected' : ''}`} onClick={() => { setRockColor('NEON_BLUE'); playSound('tap.mp3'); }}>Blue</button>
-                            <button className={`pill-opt ${rockColor === 'GOLD' ? 'selected' : ''}`} onClick={() => { setRockColor('GOLD'); playSound('tap.mp3'); }}>Gold</button>
-                            <button className={`pill-opt ${rockColor === 'PINK' ? 'selected' : ''}`} onClick={() => { setRockColor('PINK'); playSound('tap.mp3'); }}>Pink</button>
-                            <button className={`pill-opt ${rockColor === 'GREEN' ? 'selected' : ''}`} onClick={() => { setRockColor('GREEN'); playSound('tap.mp3'); }}>Green</button>
+                            <button className={`pill-opt ${gameState.rockColor === 'ORANGE' ? 'selected' : ''}`} onClick={() => updateGameSetting('rockColor', 'ORANGE')}>Orange</button>
+                            <button className={`pill-opt ${gameState.rockColor === 'NEON_BLUE' ? 'selected' : ''}`} onClick={() => updateGameSetting('rockColor', 'NEON_BLUE')}>Blue</button>
+                            <button className={`pill-opt ${gameState.rockColor === 'GOLD' ? 'selected' : ''}`} onClick={() => updateGameSetting('rockColor', 'GOLD')}>Gold</button>
+                            <button className={`pill-opt ${gameState.rockColor === 'PINK' ? 'selected' : ''}`} onClick={() => updateGameSetting('rockColor', 'PINK')}>Pink</button>
+                            <button className={`pill-opt ${gameState.rockColor === 'GREEN' ? 'selected' : ''}`} onClick={() => updateGameSetting('rockColor', 'GREEN')}>Green</button>
                         </div>
                     </div>
-
-
                     <div className="setting-section-box">
                         <span className="setting-label">DRESS UP ACCESSORIES</span>
                         <div className="setting-pill-row">
-                            <button className={`pill-opt ${accessory === 'NONE' ? 'selected' : ''}`} onClick={() => { setAccessory('NONE'); playSound('tap.mp3'); }}>None</button>
-                            <button className={`pill-opt ${accessory === 'CROWN' ? 'selected' : ''}`} onClick={() => { setAccessory('CROWN'); playSound('tap.mp3'); }}>Crown</button>
-                            <button className={`pill-opt ${accessory === 'HAT' ? 'selected' : ''}`} onClick={() => { setAccessory('HAT'); playSound('tap.mp3'); }}>Hat</button>
+                            <button className={`pill-opt ${gameState.accessory === 'NONE' ? 'selected' : ''}`} onClick={() => updateGameSetting('accessory', 'NONE')}>None</button>
+                            <button className={`pill-opt ${gameState.accessory === 'CROWN' ? 'selected' : ''}`} onClick={() => updateGameSetting('accessory', 'CROWN')}>Crown</button>
+                            <button className={`pill-opt ${gameState.accessory === 'HAT' ? 'selected' : ''}`} onClick={() => updateGameSetting('accessory', 'HAT')}>Hat</button>
+                            <button className={`pill-opt ${gameState.accessory === 'PARTY' ? 'selected' : ''}`} onClick={() => updateGameSetting('accessory', 'PARTY')}>Party</button>
+                            <button className={`pill-opt ${gameState.accessory === 'GLASSES' ? 'selected' : ''}`} onClick={() => updateGameSetting('accessory', 'GLASSES')}>Cool</button>
                         </div>
                     </div>
-
-                    <button className="reset-game-btn" onClick={() => {
-                        playSound('tap.mp3');
-                        if (confirm("Are you sure you want to completely erase game data?")) {
-                            localStorage.removeItem("ROCKSTEADY_DATA");
-                            window.location.reload();
-                        }
-                    }}>
-                        RESET GAME DATA 💥
-                    </button>
+                    <button className="reset-game-btn" onClick={() => { playSound('tap.mp3'); if (confirm("Are you sure you want to completely erase game data?")) { localStorage.removeItem("ROCKSTEADY_DATA"); window.location.reload(); } }}>RESET GAME DATA 💥</button>
                 </div>
             )}
 
             {activeTab === "ABOUT" && (
                 <div className="subview-panel-container">
                     <h3>ABOUT</h3>
-                    <p className="about-body-text">
-                        <strong>Rocksteady</strong> is a Habit Tracker Game that gamifies your daily tasks and habits by giving you a cute pet rock companion. 
-                        Take care of your rock by completing your habits, and watch it thrive! Miss tasks, and your rock's health will decline. 
-                        Customize your rock's appearance and accessories in the settings. 
-                    </p>
-                    <span className="version-tag">VibeCoded By Tharun Vijay - Version 1.0.0 (Build 2026)</span>
+                    <p className="about-body-text"><strong>Rocksteady</strong> is a local-first, privacy-focused utility built with Vite React wrapped inside Capacitor cross-platform plugins.</p>
+                    <span className="version-tag">Version 1.0.0 (Build 2026)</span>
                 </div>
             )}
 
-            {/* Standard Habit Modal Input Card Popup */}
             {isModalOpen && (
                 <div className="modal-overlay">
                     <form className="modal-content" onSubmit={handleAddHabit}>
@@ -357,7 +346,6 @@ function App() {
                 </div>
             )}
 
-            {/* Adoption Setup Popup Form */}
             {isFirstTimeModalOpen && (
                 <div className="modal-overlay">
                     <div className="modal-content first-time-modal">
@@ -369,41 +357,10 @@ function App() {
                 </div>
             )}
 
-            {/* Floating iOS Style Navigation Control Deck */}
             <div className="footer-buttons">
-                <button
-                    className={`footer-btn ${activeTab === "HOME" ? "active-nav" : ""}`}
-                    onClick={() => { setActiveTab("HOME"); playSound('tap.mp3'); }}
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                    <span className="nav-label">Home</span>
-                </button>
-
-                <button
-                    className={`footer-btn ${activeTab === "SETTINGS" ? "active-nav" : ""}`}
-                    onClick={() => { setActiveTab("SETTINGS"); playSound('tap.mp3'); }}
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                    <span className="nav-label">Settings</span>
-                </button>
-
-                <button
-                    className={`footer-btn ${activeTab === "ABOUT" ? "active-nav" : ""}`}
-                    onClick={() => { setActiveTab("ABOUT"); playSound('tap.mp3'); }}
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
-                    <span className="nav-label">About</span>
-                </button>
+                <button className={`footer-btn ${activeTab === "HOME" ? "active-nav" : ""}`} onClick={() => { setActiveTab("HOME"); playSound('tap.mp3'); }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span className="nav-label">Home</span></button>
+                <button className={`footer-btn ${activeTab === "SETTINGS" ? "active-nav" : ""}`} onClick={() => { setActiveTab("SETTINGS"); playSound('tap.mp3'); }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span className="nav-label">Settings</span></button>
+                <button className={`footer-btn ${activeTab === "ABOUT" ? "active-nav" : ""}`} onClick={() => { setActiveTab("ABOUT"); playSound('tap.mp3'); }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span className="nav-label">About</span></button>
             </div>
         </div>
     );
