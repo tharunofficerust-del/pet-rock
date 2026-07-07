@@ -810,3 +810,129 @@ body {
     font-size: 0.55rem;
     text-transform: uppercase;
 }
+
+/* ==========================================================================
+   🎨 DYNAMIC VISUAL DEGRADATION FOR THE 4 CARTOON HP STAGES
+   ========================================================================== */
+
+/* --- State 1: HAPPY (100% - 81% HP) - Default High-Contrast Pop Themes --- */
+.pet-rock.HAPPY.color-ORANGE { background: #FFB38A !important; box-shadow: inset -8px -8px 0px #E69D75, 4px 6px 0px rgba(0,0,0,0.15); }
+.pet-rock.HAPPY.color-NEON_BLUE { background: #5CE1E6 !important; box-shadow: inset -8px -8px 0px #3CBCC0, 4px 6px 0px rgba(0,0,0,0.15); }
+.pet-rock.HAPPY.color-GOLD { background: #FFDE4D !important; box-shadow: inset -8px -8px 0px #CCA000, 4px 6px 0px rgba(0,0,0,0.15); }
+.pet-rock.HAPPY.color-PINK { background: #FF94E8 !important; box-shadow: inset -8px -8px 0px #B2256B, 4px 6px 0px rgba(0,0,0,0.15); }
+.pet-rock.HAPPY.color-GREEN { background: #B6FFA1 !important; box-shadow: inset -8px -8px 0px #146C43, 4px 6px 0px rgba(0,0,0,0.15); }
+
+/* --- State 2: BORED (80% - 51% HP) - Muddy Flat Gray Face, Straight Mouth --- */
+.pet-rock.BORED { 
+    background: #A5A5A5 !important; 
+    box-shadow: inset -8px -8px 0px #8C8C8C, 4px 6px 0px rgba(0,0,0,0.15); 
+}
+.pet-rock.BORED .cartoon-mouth { 
+    width: 16px; height: 3px; border-radius: 0; background: #000000; /* Flat horizontal mouth line */
+}
+.pet-rock.BORED .cartoon-eye::after { 
+    width: 14px; height: 14px; top: 1px; left: 0px; /* Expands pupils to look blank and vacant */
+}
+
+/* --- State 3: DEPRESSED (50% - 16% HP) - Quivering Sad Melancholy Blue --- */
+.pet-rock.DEPRESSED { 
+    background: #6998FF !important; 
+    box-shadow: inset -8px -8px 0px #5381ED, 4px 6px 0px rgba(0,0,0,0.15); 
+    animation: nervousShiver 0.12s infinite linear; /* Fast structural trembling loop */
+}
+.pet-rock.DEPRESSED .cartoon-mouth { 
+    width: 18px; height: 8px; border-radius: 12px 12px 0 0; border-bottom: none; border-top: 3px solid #000000; /* Inverted quivering frown mouth */
+}
+@keyframes nervousShiver { 
+    0% { transform: translate(1px, 1px) rotate(0.5deg); } 
+    100% { transform: translate(-1px, -1px) rotate(-0.5deg); } 
+}
+
+/* --- State 4: CRACKED / DEAD (15% - 0% HP) - Pale Corpse White, Cross Eyes (✕ ✕), Dull Cheeks --- */
+.pet-rock.CRACKED {
+    background: #DCE5EB !important;
+    box-shadow: inset -8px -8px 0px #C0C9D0, 4px 6px 0px rgba(0,0,0,0.15);
+}
+.pet-rock.CRACKED .cartoon-eye {
+    background: transparent !important;
+    border: none !important;
+}
+/* Converts normal sparkle irises into text-based dead cross lines */
+.pet-rock.CRACKED .cartoon-eye::after {
+    content: '✕';
+    font-family: Arial, sans-serif; font-size: 1.1rem; font-weight: 900; color: #000;
+    background: transparent; width: auto; height: auto; top: -2px; left: -1px;
+}
+.pet-rock.CRACKED .cartoon-eye::before { display: none !important; } /* Extinguishes sparkle dots */
+.pet-rock.CRACKED .rock-blush { opacity: 0.2; } /* Fades blush patches */
+.pet-rock.CRACKED .cartoon-mouth { 
+    width: 20px; height: 4px; border: 3px solid #000; border-radius: 50%; background: #000; /* Shocked gasp dot mouth */
+}
+
+/* ==========================================================================
+   ✨ CHARMING SPARKLY FAICAL GEOMETRIES (RESTORED)
+   ========================================================================== */
+.eyes-container { display: flex; gap: 18px; margin-bottom: 6px; z-index: 10; }
+.cartoon-eye { width: 16px; height: 20px; background: #FFFFFF !important; border: 3px solid #000000; border-radius: 50%; position: relative; }
+.cartoon-eye::after { content: ''; position: absolute; width: 10px; height: 12px; background: #000000; border-radius: 50%; top: 2px; left: 1px; }
+
+/* The High-Gloss White Sparkle Reflection Dot */
+.cartoon-eye::before { 
+    content: ''; 
+    position: absolute; 
+    width: 4px; 
+    height: 4px; 
+    background: #FFFFFF !important; 
+    border-radius: 50%; 
+    top: 4px; 
+    left: 3px; 
+    z-index: 12; 
+}
+
+.cartoon-eye.blink-active { height: 4px; background: #000000 !important; margin-top: 12px; }
+.cartoon-eye.blink-active::after, .cartoon-eye.blink-active::before { display: none !important; }
+
+.rock-blush { position: absolute; width: 14px; height: 14px; background: #FF7B9C !important; border: 3.5px solid #000000; border-radius: 50%; top: 54px; z-index: 5; }
+.blush-left { left: 20px; } .blush-right { right: 20px; }
+.cartoon-mouth { width: 22px; height: 8px; border: 3px solid #000000; border-radius: 0 0 12px 12px; border-top: none; background: transparent; z-index: 8; }
+
+/* --- 🌿 High-Fidelity Accessories Placements (Pushed Left and Centered) --- */
+.sprout-leaves-asset { position: absolute; top: -30px; left: 28px; z-index: 15; filter: drop-shadow(4px 4px 0px #000000); }
+.crown-asset { top: -26px; left: 31px; transform: rotate(-4deg); filter: drop-shadow(4px 4px 0px #000000); }
+.hat-asset { top: -28px; left: 31px; transform: rotate(3deg); filter: drop-shadow(4px 4px 0px #000000); }
+.party-asset { top: -34px; left: 31px; transform: rotate(-2deg); filter: drop-shadow(4px 4px 0px #000000); }
+.premium-glasses-rig { position: absolute; top: 29px; left: 6px; z-index: 30; filter: drop-shadow(4px 4px 0px #000000); }
+/* ==========================================================================
+   🎨 VISUAL STAGES CONTROLLER MAP
+   ========================================================================== */
+
+/* Stage 2: BORED (80% - 51% HP) - Turns Dull Gray, Straight Mouth Line */
+.pet-rock.BORED { background: #A5A5A5 !important; box-shadow: inset -8px -8px 0px #8C8C8C, 4px 6px 0px rgba(0,0,0,0.15); }
+.pet-rock.BORED .cartoon-mouth { width: 16px; height: 3px; border-radius: 0; background: #000000; margin-top: 2px; }
+.pet-rock.BORED .cartoon-eye::after { width: 12px; height: 14px; top: 1px; left: 0px; }
+
+/* Stage 3: DEPRESSED (50% - 16% HP) - Rapid Trembling Shiver, Melancholy Blue */
+.pet-rock.DEPRESSED { background: #6998FF !important; box-shadow: inset -8px -8px 0px #5381ED, 4px 6px 0px rgba(0,0,0,0.15); animation: nervousShiver 0.12s infinite linear; }
+.pet-rock.DEPRESSED .cartoon-mouth { width: 18px; height: 8px; border-radius: 12px 12px 0 0; border-bottom: none; border-top: 3px solid #000000; margin-top: 2px; }
+@keyframes nervousShiver { 0% { transform: translate(1px, 1px) rotate(0.5deg); } 100% { transform: translate(-1px, -1px) rotate(-0.5deg); } }
+
+/* --- 👻 STAGE 4: HIGH-FIDELITY ANIMATED FLOATING GHOST STYLE (Under 15% HP) --- */
+.ghost-character {
+    width: 125px; height: 115px; background: rgba(255, 255, 255, 0.88) !important;
+    border: 4px solid #000000; border-radius: 50% 50% 35% 35%; position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0px 8px 0px rgba(0, 0, 0, 0.08); z-index: 5;
+}
+.ghost-float-anim { animation: ghostFloatCycle 2s ease-in-out infinite; }
+@keyframes ghostFloatCycle { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px) scaleX(1.03); } 100% { transform: translateY(0px); } }
+
+/* Ghost Bottom Floating Tail Wisps base framework */
+.ghost-tail {
+    position: absolute; bottom: -14px; left: -4px; width: 125px; height: 16px;
+    background-image: radial-gradient(circle at 15px 0, transparent 12px, #000 13px, rgba(255,255,255,0.88) 14px);
+    background-size: 33px 20px; background-repeat: repeat-x;
+}
+.ghost-eyes-container { display: flex; gap: 28px; margin-bottom: 4px; z-index: 10; }
+.ghost-cross-eye { font-family: 'Arial Black', sans-serif; font-size: 1.2rem; font-weight: 900; color: #000000; line-height: 1; }
+.ghost-wavy-mouth { width: 18px; height: 8px; border: 3.5px solid #000; border-radius: 50%; background: #000; }
+.ghost-item { top: -28px !important; left: 34px !important; }
