@@ -242,23 +242,42 @@ function App() {
     };
     return (
         <div className="app-container">
-            {/* Top Arcade Header Bar */}
+                        {/* Top Arcade Header Bar */}
             <div className="header-bar">
                 {isEditingName ? (
                     <div className="name-edit-box">
-                        <input className="inline-name-input" value={tempName} onChange={(e) => setTempName(e.target.value)} maxLength={12} autoFocus />
+                        <input 
+                            className="inline-name-input" 
+                            value={tempName} 
+                            onChange={(e) => setTempName(e.target.value)} 
+                            maxLength={12} 
+                            autoFocus 
+                            onBlur={saveNewName} /* Automatically saves name if user clicks away */
+                            onKeyDown={(e) => e.key === 'Enter' && saveNewName()} /* Saves on Enter */
+                        />
                         <button className="inline-save-btn" onClick={saveNewName}>✓</button>
                     </div>
                 ) : (
-                    <strong className="editable-name-label" onClick={() => setIsEditingName(true)}>
-                        {gameState.rockName}
-                        <svg className="edit-pencil-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                    </strong>
+                    /* 🏷️ STYLIZED STICKER BANNER: Tap anywhere on the block to rename */
+                    <div className="stylized-name-badge" onClick={() => setIsEditingName(true)}>
+                        <span className="app-title-prefix">PET</span>
+                        <strong className="main-rock-name-text">{gameState.rockName}</strong>
+                    </div>
                 )}
-                <div className="streak-badge" onClick={() => alert(`🔥 Active Streak: ${gameState.streakCount} Days!`)} style={{ cursor: 'pointer' }}>
+                
+                {/* 🆕 UPGRADE: Replaced standard browser alert popup with interactive in-game speech dialog */}
+                <div 
+                    className="streak-badge" 
+                    onClick={() => {
+                        playSound('success.mp3');
+                        setDialogue(`🔥 Streak Info: You have a ${gameState.streakCount}-day discipline streak! Keep feeding my mineral matrix!`);
+                    }}
+                    style={{ cursor: 'pointer' }}
+                >
                     🔥 {gameState.streakCount}
                 </div>
             </div>
+
 
             {/* Health Meter Container */}
             <div className="health-container">
@@ -487,8 +506,8 @@ function App() {
                         <strong>Pet Pebble</strong> is a high-discipline accountability game designed to keep your habits rock-solid!
                     </p>
 
-                    <div style={{ textAlign: 'left', background: '#000000', color: '#FFF', padding: '12px', borderRadius: '16px', border: '3px solid #000', boxShadow: '4px 4px 0px #FF52C1', marginBottom: '14px' }}>
-                        <span style={{ fontFamily: 'Lexend Mega', fontSize: '0.65rem', fontWeight: 900, color: '#FFD500', display: 'block', marginBottom: '6px' }}>🎮 HOW TO PLAY:</span>
+                    <div style={{ textAlign: 'left', background: '#FFDE4D', color: '#000000', padding: '12px', borderRadius: '16px', border: '3px solid #000000', boxShadow: '4px 4px 0px #FF52C1', marginBottom: '14px' }}>
+                        <span style={{ fontFamily: 'Lexend Mega', fontSize: '0.65rem', fontWeight: 900, color: '#000000', display: 'block', marginBottom: '6px' }}>🎮 HOW TO PLAY:</span>
                         <ul style={{ paddingLeft: '16px', fontFamily: 'Fredoka', fontSize: '0.8rem', lineHeight: '1.4', listStyleType: 'square' }}>
                             <li>Add up to <strong>5 custom habits</strong> on the home tab.</li>
                             <li>Check them off daily to fuel your pebble's <strong>Mineral Energy</strong>.</li>
@@ -497,6 +516,7 @@ function App() {
                         </ul>
                     </div>
 
+                    
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', borderTop: '3px solid #000', paddingTop: '10px', marginTop: 'auto' }}>
                         <span style={{ fontFamily: 'Lexend Mega', fontSize: '0.65rem', fontWeight: 900, color: '#00E5FF' }}>DESIGNED & DEVELOPED BY:</span>
                         <strong style={{ fontFamily: 'Lexend Mega', fontSize: '0.9rem', fontWeight: 900, color: '#000' }}>THARUN VIJAY 🚀</strong>

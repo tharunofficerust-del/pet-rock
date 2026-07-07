@@ -35,15 +35,43 @@ body {
     padding: 24px 20px 10px 20px;
 }
 
-.editable-name-label {
-    font-family: 'Lexend Mega', sans-serif;
-    font-weight: 900;
-    font-size: 1.2rem;
-    color: #000;
-    cursor: pointer;
-    padding: 2px 6px;
+/* --- 🏷️ Stylized Neo-Brutalist Name Badge Sticker --- */
+.stylized-name-badge {
+    background: #00E5FF !important; /* Cyber Vibrant Cyan */
+    border: 3px solid #000000;
+    border-radius: 12px;
+    padding: 6px 14px;
     display: flex;
     align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #000000;
+    transition: transform 0.1s ease;
+}
+
+.stylized-name-badge:hover {
+    transform: scale(1.03) rotate(-1deg);
+    background: #2BF0FF !important;
+}
+
+.app-title-prefix {
+    font-family: 'Lexend Mega', sans-serif;
+    font-weight: 900;
+    font-size: 0.65rem;
+    background: #000000;
+    color: #FFFFFF;
+    padding: 2px 5px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.main-rock-name-text {
+    font-family: 'Lexend Mega', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    color: #000000;
+    text-transform: uppercase;
 }
 
 .edit-pencil-icon {
