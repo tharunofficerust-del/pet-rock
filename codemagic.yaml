@@ -20,6 +20,8 @@ workflows:
           # 2. Verify or fallback install Node 20 runtime environments
           nvm use 20 || nvm install 20
           node --version
+
+          cd src/main/resources/static/rocksteady-app
           
           # 3. Clean compile the web layers assets index sheets
           npm install --legacy-peer-deps
