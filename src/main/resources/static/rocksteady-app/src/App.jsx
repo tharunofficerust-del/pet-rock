@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import './App.css';
 
@@ -21,24 +22,24 @@ function App() {
     const [newHabitTitle, setNewHabitTitle] = useState("");
     const [dialogue, setDialogue] = useState("Tap me, slacker. Let's see your progress.");
     const [isDialogueVisible, setIsDialogueVisible] = useState(true);
-    
-    // --- Visual layout views and animation tracking states ---
-    const [activeTab, setActiveTab] = useState("HOME"); 
+
+    // --- Layout viewports and animation navigation tracking hooks ---
+    const [activeTab, setActiveTab] = useState("HOME");
     const [isEditingName, setIsEditingName] = useState(false);
     const [tempName, setTempName] = useState("");
     const [isBlinking, setIsBlinking] = useState(false);
     const [isTalking, setIsTalking] = useState(false);
-    const [isJumping, setIsJumping] = useState(false);
+     const [isJumping, setIsJumping] = useState(false); 
 
     const playSound = (soundFileName) => {
         const audio = new Audio(`/sounds/${soundFileName}`);
         audio.volume = 0.4;
-        audio.play().catch(() => console.log("Audio awaiting user gesture interaction activation"));
+        audio.play().catch(() => console.log("Audio waiting for active interaction layers"));
     };
     useEffect(() => {
         const saved = localStorage.getItem("ROCKSTEADY_DATA");
         const todayStr = new Date().toISOString().split('T');
-        
+
         let currentData = saved ? JSON.parse(saved) : {
             rockName: "Rocky",
             healthPoints: 100,
@@ -88,13 +89,15 @@ function App() {
         setGameState(currentData);
         setTempName(currentData.rockName);
     }, []);
+        // --- 🆕 FIX B: Auto-Refreshes Timer on Rapid Tap Cycles ---
     useEffect(() => {
         setIsDialogueVisible(true);
         const timer = setTimeout(() => {
             setIsDialogueVisible(false);
         }, 4000);
-        return () => clearTimeout(timer);
-    }, [dialogue]);
+        return () => clearTimeout(timer); // Clears previous pending timeouts on click bursts
+    }, [dialogue]); // Reacts immediately whenever a fresh text string drops in
+
 
     useEffect(() => {
         const blinkInterval = setInterval(() => {
@@ -119,7 +122,6 @@ function App() {
 
     const updateGameSetting = (key, value) => {
         let updated = { ...gameState, [key]: value };
-        
         if (key === 'healthPoints') {
             let hp = value;
             if (hp <= 15) updated.moodState = "CRACKED";
@@ -127,7 +129,6 @@ function App() {
             else if (hp <= 80) updated.moodState = "BORED";
             else updated.moodState = "HAPPY";
         }
-        
         saveState(updated);
     };
     const toggleHabit = (id) => {
@@ -138,15 +139,13 @@ function App() {
                 particleCount: 80,
                 spread: 60,
                 origin: { y: 0.65 },
-                colors: ['#FF94E8', '#5CE1E6', '#FFDE4D', '#B6FFA1']
+                colors: ['#FF52C1', '#00E5FF', '#FFD500', '#26E65B']
             });
-            setIsJumping(true);
-            setTimeout(() => setIsJumping(false), 600);
             setDialogue("YAY! High discipline energy right there!");
         } else {
             playSound('tap.mp3');
         }
-        const updatedHabits = gameState.habits.map(h => 
+        const updatedHabits = gameState.habits.map(h =>
             h.id === id ? { ...h, isCompletedToday: !h.isCompletedToday } : h
         );
         saveState({ ...gameState, habits: updatedHabits });
@@ -177,17 +176,49 @@ function App() {
         setIsTalking(true);
         setTimeout(() => setIsTalking(false), 1200);
 
+        // 🎲 DYNAMIC PHYSICS DICE ROLL: Randomly choose between a jump or squish animation
+        const isLuckyJump = Math.random() > 0.6;
+        if (isLuckyJump && gameState.moodState !== "CRACKED") {
+            setIsJumping(true);
+            setTimeout(() => setIsJumping(false), 600);
+        }
+
         let quotes = [];
         if (gameState.moodState === "CRACKED") {
-            quotes = ["BOO! Your lazy habits ended my mortal stone skin!", "I'm haunting you until you finish your tasks!", "A ghost rock never sleeps... do your chores!"];
+            quotes = [
+                "BOO! Your laziness literally shattered my physical rock skin! 👻",
+                "I am haunting your notifications until you finish a task!",
+                "Look at what you did! I am a spectral stone cloud now. Do your chores!",
+                "Ghost rocks never rest... and neither should slackers. Go check a box!"
+            ];
         } else if (gameState.moodState === "DEPRESSED") {
-            quotes = ["Ugh... I feel faint... check off a box!", "My stone is shivering... too many open tasks!", "Help me... my healthbar is tanking..."];
+            quotes = [
+                "Ugh... my mineral core is fading... check off a box quick! 🤒",
+                "I am shivering under this blanket because you are procrastinating!",
+                "Call a doctor! Or better yet, go complete your daily tracker!",
+                "Help me... this thermometer is about to explode from high slacker stress!"
+            ];
+        } else if (gameState.moodState === "BORED") {
+            quotes = [
+                "Yawn... scrolling social media is contagious, I see. 🥱",
+                "Wake me up when you actually decide to be productive today.",
+                "This snot bubble is the only exciting thing happening in this app right now.",
+                "Are we going to hit our goals today or just stare at my eyelids?"
+            ];
         } else {
-            quotes = [`Hey! Gentle with the clicks, human!`, `My name is ${gameState.rockName}. Maintain my daily tracking metrics!`, `Streak count is looking sweet at ${gameState.streakCount}!`];
+            // HAPPY / FULL HEALTH QUOTES
+            quotes = [
+                "Ow! Gentle with the clicks, human! I'm feeling strong today! 💪",
+                "Look at these sparkly eyes! Peak discipline performance right here!",
+                "Daily streak is absolute fire! Keep feeding my mineral matrix!",
+                "100% health feels incredible. Let's crush our remaining open tasks!"
+            ];
         }
+
         const randomIndex = Math.floor(Math.random() * quotes.length);
         setDialogue(quotes[randomIndex]);
     };
+
 
     const saveNewName = () => {
         if (tempName.trim()) {
@@ -201,7 +232,7 @@ function App() {
     };
     return (
         <div className="app-container">
-            {/* Top Arcade Navigation Row Header */}
+            {/* Top Arcade Header Bar */}
             <div className="header-bar">
                 {isEditingName ? (
                     <div className="name-edit-box">
@@ -214,14 +245,7 @@ function App() {
                         <svg className="edit-pencil-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                     </strong>
                 )}
-                <div 
-                    className="streak-badge" 
-                    onClick={() => {
-                        playSound('tap.mp3');
-                        alert(`🔥 Streak Status: You are on a ${gameState.streakCount}-day discipline streak! Keep feeding my mineral energy!`);
-                    }}
-                    style={{ cursor: 'pointer' }}
-                >
+                <div className="streak-badge" onClick={() => alert(`🔥 Active Streak: ${gameState.streakCount} Days!`)} style={{ cursor: 'pointer' }}>
                     🔥 {gameState.streakCount}
                 </div>
             </div>
@@ -230,109 +254,107 @@ function App() {
             <div className="health-container">
                 <label>HEALTH TRACKER ({gameState.healthPoints}%)</label>
                 <div className="health-bar-bg">
-                    <div className="health-bar-fill" style={{ width: `${gameState.healthPoints}%` }}></div>
+                    <motion.div
+                        className="health-bar-fill"
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${gameState.healthPoints}%` }}
+                        transition={{ type: "spring", stiffness: 60 }}
+                    />
                 </div>
             </div>
-            {/* Central Main Gaming View Deck Screen Matrix */}
+            {/* Central Gaming View Deck Panel Screen */}
             <div className="rock-area">
                 <div className={`speech-bubble ${isDialogueVisible ? 'fade-in' : 'fade-out'}`}>{dialogue}</div>
-                
-                {/* 👻 STATE 4 DESIGN: THE GHOST ASCENSION (Fires under 15% HP) */}
-                {gameState.moodState === "CRACKED" ? (
-                    <div className="ghost-stage-wrapper">
-                        <div className="broken-rock-shell">
-                            <div className="shell-crack-line"></div>
-                        </div>
 
-                        <div className="ghost-character ghost-float-anim" onClick={handleRockClick}>
-                            {gameState.accessory === "CROWN" && <svg className="rock-accessory crown-asset ghost-item" width="56" height="42" viewBox="0 0 24 24"><path d="M2,19 L22,19 L20,8 L16,13 L12,5 L8,13 L4,8 Z" fill="#000" /><path d="M3,18 L21,18 L19,8 L15,13 L12,5 L9,13 L5,8 Z" fill="#FFD166" stroke="#000" strokeWidth="2.5" strokeLinejoin="round"/></svg>}
-                            {gameState.accessory === "HAT" && <svg className="rock-accessory hat-asset ghost-item" width="55" height="42" viewBox="0 0 24 24"><path d="M4,18 C4,15 5,15 6,15 L6,6 L17,6 L17,15 Z" fill="#111" stroke="#000" strokeWidth="2.5" strokeLinejoin="round"/></svg>}
-                            
-                            <div className="ghost-tail"></div>
-                            <div className="ghost-eyes-container">
-                                <div className="ghost-cross-eye">✕</div>
-                                <div className="ghost-cross-eye">✕</div>
-                            </div>
-                            <div className="ghost-wavy-mouth"></div>
-                        </div>
-                    </div>
-                ) : (
-                    /* 🪨 STATES 1-3 DESIGN: SINGLE CLEAN EXPRESSIVE CARTOON ROCK BASE COMPONENTS */
-                    <div className={`pet-rock color-${gameState.rockColor} ${gameState.moodState} ${isTalking ? 'talking-mouth-anim' : ''} ${isJumping ? 'jump-active-anim' : 'rock-breathing-idle'}`} onClick={handleRockClick}>
-                        
-                        {gameState.accessory === "NONE" && (
-                            <div className="rock-accessory sprout-leaves-asset">
-                                <svg width="60" height="35" viewBox="0 0 60 35" version="1.1">
-                                    <path d="M30,35 L30,22" stroke="#000000" strokeWidth="4" strokeLinecap="round" />
-                                    <path d="M30,22 C15,12 10,24 5,16 C10,4 25,12 30,22 Z" fill="#B6FFA1" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
-                                    <path d="M30,22 C45,12 50,24 55,16 C50,4 35,12 30,22 Z" fill="#B6FFA1" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                        )}
-
-                        {/* State 2 Overlay: Fracture Shell Path Grids (Under 80% HP) */}
-                        {gameState.healthPoints <= 80 && (
-                            <div className="rock-fracture-cracks">
-                                <svg width="125" height="115" viewBox="0 0 125 115" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-                                    <path d="M15,25 L30,32 L24,45" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
-                                    <path d="M105,95 L92,80 L98,68 L88,60" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
-                                </svg>
-                            </div>
-                        )}
-
-                        {/* State 3 Overlay: Hospital Patient Bed Layers (Under 50% HP) */}
-                        {gameState.healthPoints <= 50 && (
-                            <>
-                                <div className="hospital-ice-pack">
-                                    <svg width="40" height="25" viewBox="0 0 40 25">
-                                        <ellipse cx="20" cy="15" rx="16" ry="8" fill="#5CE1E6" stroke="#000" strokeWidth="2.5" />
-                                        <path d="M20,7 L20,2" stroke="#000" strokeWidth="3" strokeLinecap="round" /><circle cx="20" cy="2" r="2" fill="#000" />
+                <AnimatePresence mode="wait">
+                    {gameState.moodState === "CRACKED" ? (
+                        /* 👻 STATE 4 DESIGN: GHOST ASCENSION WITH SMOOTH TRANSITIONS */
+                        <motion.div
+                            key="ghost-view" className="ghost-stage-wrapper"
+                            initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{ type: "spring", bounce: 0.4 }}
+                        >
+                            <div className="broken-rock-shell"><div className="shell-crack-line"></div></div>
+                            <motion.div
+                                className="ghost-character ghost-float-anim" onClick={handleRockClick}
+                                whileTap={{ scale: 0.93, y: 5 }}
+                            >
+                                <div className="ghost-tail"></div>
+                                <div className="ghost-eyes-container">
+                                    <div className="ghost-cross-eye">✕</div>
+                                    <div className="ghost-cross-eye">✕</div>
+                                </div>
+                                <div className="ghost-wavy-mouth"></div>
+                            </motion.div>
+                        </motion.div>
+                    ) : (
+                        /* 🪨 STATES 1-3 DESIGN: SINGLE-MESH MOTION INTERFACE WITH ZERO DUPLICATIONS */
+                        <motion.div
+                            key="rock-view"
+                            className={`pet-rock color-${gameState.rockColor} ${gameState.moodState} ${isTalking ? 'talking-mouth-anim' : ''} ${isJumping ? 'jump-active-anim' : ''}`}
+                            onClick={handleRockClick}
+                            animate={{
+                                y: [0, -4, 0],
+                                scaleX: [1, 1.03, 1],
+                                scaleY: [1, 0.97, 1]
+                            }}
+                            transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                            whileHover={{ scale: 1.04 }}
+                            whileTap={{ scale: 0.85, scaleY: 0.7, scaleX: 1.25, rotate: 2 }}
+                        >
+                            {gameState.accessory === "NONE" && (
+                                <div className="rock-accessory sprout-leaves-asset">
+                                    <svg width="60" height="35" viewBox="0 0 60 35">
+                                        <path d="M30,35 L30,22" stroke="#000000" strokeWidth="4" strokeLinecap="round" />
+                                        <path d="M30,22 C15,12 10,24 5,16 C10,4 25,12 30,22 Z" fill="#26E65B" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
+                                        <path d="M30,22 C45,12 50,24 55,16 C50,4 35,12 30,22 Z" fill="#26E65B" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
                                     </svg>
                                 </div>
-                                <div className="hospital-blanket">
-                                    <div className="blanket-fold-line"></div>
-                                    <span className="medical-cross-symbol">＋</span>
+                            )}
+
+                            {gameState.healthPoints <= 80 && (
+                                <div className="rock-fracture-cracks">
+                                    <svg width="125" height="115" viewBox="0 0 125 115" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+                                        <path d="M15,25 L30,32 L24,45" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
+                                        <path d="M105,95 L92,80 L98,68 L88,60" stroke="#000000" strokeWidth="3" strokeLinecap="round" fill="none" />
+                                    </svg>
                                 </div>
-                                <div className="hospital-thermometer"></div>
-                            </>
-                        )}
+                            )}
 
-                        <div className="rock-blush blush-left"></div>
-                        <div className="rock-blush blush-right"></div>
-                        
-                        {/* Single, Unified Expressive Eyes Layer */}
-                    <div className="eyes-container">
-                        <div className={`cartoon-eye ${isBlinking ? 'blink-active' : ''}`}>
-                            <div className="cartoon-eye-glint-two"></div>
-                        </div>
-                        <div className={`cartoon-eye ${isBlinking ? 'blink-active' : ''}`}>
-                            <div className="cartoon-eye-glint-two"></div>
-                        </div>
-                    </div>
+                            {gameState.healthPoints <= 50 && (
+                                <>
+                                    <div className="hospital-ice-pack"><svg width="40" height="25" viewBox="0 0 40 25"><ellipse cx="20" cy="15" rx="16" ry="8" fill="#00E5FF" stroke="#000" strokeWidth="2.5" /><path d="M20,7 L20,2" stroke="#000" strokeWidth="3" /><circle cx="20" cy="2" r="2" fill="#000" /></svg></div>
+                                    <div className="hospital-blanket"><div className="blanket-fold-line"></div><span className="medical-cross-symbol">＋</span></div>
+                                    <div className="hospital-thermometer"></div>
+                                </>
+                            )}
 
-                        <div className="cartoon-mouth"></div>
-
-                        {/* 💤 RETRO ARCADE ANIME SIGH BUBBLE SYSTEM */}
-                        {gameState.moodState === "BORED" && (
-                            <div className="anime-sleepy-bubble">
-                                <svg width="40" height="40" viewBox="0 0 40 40">
-                                    <circle cx="20" cy="20" r="16" fill="#A0F4FF" stroke="#000000" strokeWidth="3" />
-                                    <path d="M12,12 C15,9 18,9 20,10" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                                </svg>
-                                <span className="sleepy-zzz-tag">Z</span>
+                            <div className="rock-blush blush-left"></div>
+                            <div className="rock-blush blush-right"></div>
+                            <div className="eyes-container">
+                                <div className="cartoon-eye"><div className="cartoon-eye-glint-two"></div></div>
+                                <div className="cartoon-eye"><div className="cartoon-eye-glint-two"></div></div>
                             </div>
-                        )}
+                            <div className="cartoon-mouth"></div>
 
-                        {gameState.accessory === "CROWN" && <svg className="rock-accessory crown-asset" width="56" height="42" viewBox="0 0 24 24" version="1.1"><path d="M2,19 L22,19 L20,8 L16,12 L12,4 L8,12 L4,7 Z" fill="#000" /><path d="M3,18 L21,18 L19,8 L15,13 L12,5 L9,13 L5,8 Z" fill="#FFD166" stroke="#000" strokeWidth="2.5" strokeLinejoin="round"/><circle cx="12" cy="5" r="1.5" fill="#FF7B9C" stroke="#000" strokeWidth="1"/><circle cx="5" cy="8" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1"/><circle cx="19" cy="8" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1"/></svg>}
-                        {gameState.accessory === "HAT" && <svg className="rock-accessory hat-asset" width="55" height="42" viewBox="0 0 24 24" version="1.1"><path d="M4,18 C4,15 5,15 6,15 L6,6 C6,5 7,4 9,4 L15,4 C17,4 18,5 18,6 L18,15 C19,15 21,15 21,18 C21,19.5 19,20 12,20 C5,20 3,19.5 3,18 Z" fill="#111111" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round"/><path d="M6,14 L18,14" stroke="#FF7B9C" strokeWidth="3.5" strokeLinecap="round"/></svg>}
-                        {gameState.accessory === "PARTY" && <svg className="rock-accessory party-asset" width="55" height="55" viewBox="0 0 24 24" version="1.1"><path d="M12,1 L2.5,19.5 L21.5,19.5 Z" fill="#000000"/><path d="M12,2 L3,19 L21,19 Z" fill="#FF94E8" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round"/><circle cx="12" cy="2" r="3" fill="#FFDE4D" stroke="#000000" strokeWidth="2.5"/></svg>}
-                        {gameState.accessory === "GLASSES" && (
-                            <div className="premium-glasses-rig">
-                                <svg width="106" height="36" viewBox="0 0 106 36" version="1.1"><rect x="25" y="11" width="56" height="6" fill="#000000" rx="3" /><circle cx="23" cy="17" r="16" fill="#000000" /><circle cx="23" cy="17" r="12" fill="#111111" /><path d="M15,14 C19,10 23,12 25,15" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" fill="none" /><circle cx="83" cy="17" r="16" fill="#000000" /><circle cx="83" cy="17" r="12" fill="#111111" /><path d="M75,14 C79,10 83,12 85,15" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" fill="none" /></svg>
-                            </div>
-                        )}
-                    </div>
-                )}
+                            {gameState.moodState === "BORED" && (
+                                <div className="anime-sleepy-bubble">
+                                    <svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="#A0F4FF" stroke="#000" strokeWidth="3" /><path d="M12,12 C15,9 18,9 20,10" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" fill="none" /></svg>
+                                    <span className="sleepy-zzz-tag">Z</span>
+                                </div>
+                            )}
+
+                            {gameState.accessory === "CROWN" && <svg className="rock-accessory crown-asset" width="56" height="42" viewBox="0 0 24 24"><path d="M2,19 L22,19 L20,8 L16,13 L12,5 L8,13 L4,8 Z" fill="#000" /><path d="M3,18 L21,18 L19,8 L15,13 L12,5 L9,13 L5,8 Z" fill="#FFD500" stroke="#000" strokeWidth="2.5" strokeLinejoin="round" /><circle cx="12" cy="5" r="1.5" fill="#FF52C1" stroke="#000" strokeWidth="1" /><circle cx="5" cy="8" r="1.5" fill="#00E5FF" stroke="#000" strokeWidth="1" /><circle cx="19" cy="8" r="1.5" fill="#00E5FF" stroke="#000" strokeWidth="1" /></svg>}
+                            {gameState.accessory === "HAT" && <svg className="rock-accessory hat-asset" width="55" height="42" viewBox="0 0 24 24"><path d="M4,18 C4,15 5,15 6,15 L6,6 L17,6 L17,15 C19,15 21,15 21,18 Z" fill="#111" stroke="#000" strokeWidth="2.5" strokeLinejoin="round" /><path d="M6,14 L18,14" stroke="#FF52C1" strokeWidth="3.5" strokeLinecap="round" /></svg>}
+                            {gameState.accessory === "PARTY" && <svg className="rock-accessory party-asset" width="55" height="55" viewBox="0 0 24 24"><path d="M12,1 L2.5,19.5 L21.5,19.5 Z" fill="#000000" /><path d="M12,2 L3,19 L21,19 Z" fill="#FF52C1" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round" /><circle cx="12" cy="2" r="3" fill="#FFD500" stroke="#000000" strokeWidth="2.5" /></svg>}
+                            {gameState.accessory === "GLASSES" && (
+                                <div className="premium-glasses-rig">
+                                    <svg width="106" height="36" viewBox="0 0 106 36"><rect x="25" y="11" width="56" height="6" fill="#000000" rx="3" /><circle cx="23" cy="17" r="16" fill="#000000" /><circle cx="23" cy="17" r="12" fill="#111111" /><path d="M15,14 C19,10 23,12 25,15" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" fill="none" /><circle cx="83" cy="17" r="16" fill="#000000" /><circle cx="83" cy="17" r="12" fill="#111111" /><path d="M75,14 C79,10 83,12 85,15" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" fill="none" /></svg>
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
             {/* --- Core Routing Tabs View Switcher Block --- */}
             {activeTab === "HOME" && (
@@ -393,8 +415,7 @@ function App() {
                     <h3>ABOUT</h3>
                     <p className="about-body-text"><strong>Rocksteady</strong> is a local-first, privacy-focused utility built with Vite React wrapped inside Capacitor cross-platform plugins.</p>
                     <span className="version-tag">Version 1.0.0 (Build 2026)</span>
-                    
-                    {/* 🛠️ INTEGRATED LIVE HEALTH STATE TEST PANEL */}
+
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '10px', borderTop: '2px dashed #000', paddingTop: '8px' }}>
                         <span style={{ fontSize: '0.55rem', fontFamily: 'Lexend Mega', fontWeight: 900 }}>TAP TO TEST VISUAL STAGES:</span>
                         <div style={{ display: 'flex', gap: '4px' }}>
@@ -425,7 +446,7 @@ function App() {
                     <div className="modal-content first-time-modal">
                         <h2>WELCOME! 🎉</h2>
                         <p>Adopt your new accountability pet rock. Give them a special name to get started!</p>
-                        <input className="modal-input first-name-field" type="text" placeholder="Name your rock (e.g. Rocky...)" value={tempName} onChange={(e) => setTempName(e.target.value)} maxLength={12} required />
+                        <input className="modal-input first-name-field" type="text" placeholder="Name your rock..." value={tempName} onChange={(e) => setTempName(e.target.value)} maxLength={12} required />
                         <button className="save-modal-btn start-game-btn" onClick={saveNewName}>ADOPT PET ROCK 🪨</button>
                     </div>
                 </div>
