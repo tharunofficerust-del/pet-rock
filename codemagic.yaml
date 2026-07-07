@@ -1,0 +1,37 @@
+# Master Codemagic Compilation Script for Pet Pebble
+# Configured for Capacitor Native Build Environments
+workflows:
+  android-workflow:
+    name: Android Capacitor Production Build
+    max_build_duration: 30
+    instance_type: mac_mini_m1
+    environment:
+      node: 18.x
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - target: main
+    scripts:
+      - name: Install Web and Native Core Packages
+        script: |
+          npm install --legacy-peer-deps
+      - name: Build Web Asset Bundle Layers
+        script: |
+          npm run build
+      - name: Capacitor Native Workspace Sync
+        script: |
+          npx cap sync android
+      - name: Compile Standalone Production APK Package
+        script: |
+          cd android && ./gradlew assembleDebug
+    artifacts:
+      - android/app/build/outputs/apk/**/*.apk
+    publishing:
+      email:
+        recipients:
+          - tharunrust@gmail.com # Automatically sends the APK directly to your email inbox!
+          - tharunofficerust@gmail.com # Automatically sends the APK directly to your email inbox!
+        notify:
+          success: true
+          failure: true
