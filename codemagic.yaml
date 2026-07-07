@@ -9,7 +9,7 @@ workflows:
       events:
         - push
       branch_patterns:
-        - main
+        - pattern: 'main'
     scripts:
       - name: Build Web Application Bundle Layers
         script: |
