@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Rocksteady</string>
-    <string name="title_activity_main">Rocksteady</string>
+    <string name="app_name">Pet Pebble</string>
+    <string name="title_activity_main">Pet Pebble</string>
     <string name="package_name">com.accountability.petrock</string>
     <string name="custom_url_scheme">com.accountability.petrock</string>
 </resources>
