@@ -291,15 +291,68 @@ body {
     z-index: 6;
 }
 
-.pet-rock::before {
-    content: '';
-    position: absolute;
-    width: 100px;
-    height: 14px;
-    background: radial-gradient(circle, rgba(255, 105, 180, 0.6) 0%, rgba(255, 105, 180, 0) 70%);
-    top: 52px;
-    z-index: 1;
+/* --- 🎨 5 Premium Neo-Brutalist Color Themes (Fixed Gradients) --- */
+.pet-rock.color-ORANGE {
+    background: radial-gradient(circle at 35% 30%, #FFA87D 0%, #FF9E6E 40%, #E07A48 100%) !important;
+    box-shadow: inset -8px -8px 0px #E69D75, 4px 6px 0px rgba(0,0,0,0.15);
 }
+.pet-rock.color-NEON_BLUE {
+    background: radial-gradient(circle at 35% 30%, #A0F4FF 0%, #5CE1E6 40%, #20A5A9 100%) !important;
+    box-shadow: inset -8px -8px 0px #3CBCC0, 4px 6px 0px rgba(0,0,0,0.15);
+}
+.pet-rock.color-GOLD {
+    background: radial-gradient(circle at 35% 30%, #FFF59D 0%, #FFD54F 40%, #E6A100 100%) !important;
+    box-shadow: inset -8px -8px 0px #CCA000, 4px 6px 0px rgba(0,0,0,0.15);
+}
+.pet-rock.color-PINK {
+    background: radial-gradient(circle at 35% 30%, #FFC4E1 0%, #FF82C1 40%, #D63384 100%) !important;
+    box-shadow: inset -8px -8px 0px #B2256B, 4px 6px 0px rgba(0,0,0,0.15);
+}
+.pet-rock.color-GREEN {
+    background: radial-gradient(circle at 35% 30%, #D4FFDF 0%, #4B847D 40%, #198754 100%) !important;
+    box-shadow: inset -8px -8px 0px #146C43, 4px 6px 0px rgba(0,0,0,0.15);
+}
+
+
+
+/* --- 🛠️ 100% Fixed Facial Blending Blush Effect --- */
+/* --- 🛠️ 100% Fixed Dual Cartoon Cheek Blush (No Layout Bleeding) --- */
+.pet-rock::before {
+    content: ''; 
+    position: absolute;
+    width: 14px; 
+    height: 14px;
+    background: #FF7B9C !important; /* Soft premium pastel rose pink from our theme */
+    border: 3.5px solid #000000;
+    border-radius: 50%; /* Perfect round cheek circle unit */
+    top: 54px; 
+    left: 20px; /* Positions perfectly right below the left eye */
+    z-index: 1; 
+    /* Dual placement trick: Use a box-shadow to stamp a matching right cheek circle instantly! */
+    box-shadow: 62px 0px 0px #FF7B9C, 62px 0px 0px 0px #000000;
+}
+
+
+/* --- 👑 Custom SVG Vector Accessories Anchors --- */
+.rock-accessory {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+    overflow: visible;
+}
+.crown-asset {
+    top: -24px;
+    left: 42px;
+    transform: rotate(-6deg);
+    filter: drop-shadow(3px 3px 0px #000);
+}
+.hat-asset {
+    top: -26px;
+    left: 42px;
+    transform: rotate(4deg);
+    filter: drop-shadow(4px 3px 0px #000);
+}
+
 
 .cartoon-eye.blink-active {
     height: 4px;
@@ -672,4 +725,69 @@ body {
     font-size: 0.55rem;
     color: #666;
     margin-top: auto;
+}
+/* --- Color Theme Modifiers --- */
+.pet-rock.color-ORANGE {
+    background: radial-gradient(circle at 35% 30%, #FFA87D 0%, #FF9E6E 40%, #E07A48 100%) !important;
+    box-shadow: inset -8px -8px 0px #E69D75, 4px 6px 0px rgba(0,0,0,0.15);
+}
+.pet-rock.color-NEON_BLUE {
+    background: radial-gradient(circle at 35% 30%, #A0F4FF 0%, #5CE1E6 50%, #00A4A6 100%) !important;
+    box-shadow: inset -8px -8px 0px #3CBCC0, 4px 6px 0px rgba(0,0,0,0.15);
+}
+.pet-rock.color-GOLD {
+    background: radial-gradient(circle at 35% 30%, #FFF59D 0%, #FFD54F 50%, #FFB300 100%) !important;
+    box-shadow: inset -8px -8px 0px #E6B800, 4px 6px 0px rgba(0,0,0,0.15);
+}
+
+/* --- Accessories Overlay Anchors --- */
+.rock-accessory {
+    position: absolute;
+    font-size: 2.5rem;
+    z-index: 10;
+    pointer-events: none;
+    filter: drop-shadow(3px 3px 0px #000);
+}
+.crown-asset { top: -28px; left: 34px; transform: rotate(-5deg); }
+.hat-asset { top: -32px; left: 36px; transform: rotate(3deg); }
+
+/* --- Settings Grid Layout Extensions --- */
+.setting-section-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+.setting-label {
+    font-family: 'Lexend Mega', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #555;
+    text-transform: uppercase;
+}
+.setting-pill-row {
+    display: flex;
+    gap: 6px;
+    background: #000000;
+    padding: 4px;
+    border-radius: 14px;
+}
+.pill-opt {
+    flex: 1;
+    padding: 6px 2px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: #FFFFFF;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+.pill-opt.selected {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    border: 2px solid #000000;
+    box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
 }

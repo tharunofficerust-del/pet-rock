@@ -19,13 +19,23 @@ function App() {
     const [dialogue, setDialogue] = useState("Tap me, slacker. Let's see your progress.");
     const [isDialogueVisible, setIsDialogueVisible] = useState(true);
 
-    // --- Expression & Layout Navigation States ---
+    // --- Expression, Layout Tabs, and Custom Customization Hooks ---
     const [activeTab, setActiveTab] = useState("HOME"); // HOME, SETTINGS, ABOUT
+    const [difficulty, setDifficulty] = useState("NORMAL"); // EASY, NORMAL, HARDCORE
+    const [rockColor, setRockColor] = useState("ORANGE");   // ORANGE, NEON_BLUE, GOLD
+    const [accessory, setAccessory] = useState("NONE");     // NONE, CROWN, HAT
     const [isEditingName, setIsEditingName] = useState(false);
     const [tempName, setTempName] = useState("");
     const [isBlinking, setIsBlinking] = useState(false);
     const [isTalking, setIsTalking] = useState(false);
     const [isJumping, setIsJumping] = useState(false);
+
+    // --- Built-in Offline HTML5 Sound Constructor Engine ---
+    const playSound = (soundFileName) => {
+        const audio = new Audio(`/sounds/${soundFileName}`);
+        audio.volume = 0.4;
+        audio.play().catch(() => console.log("Audio waiting for user-tap interaction layer activation"));
+    };
 
     // --- On Launch: Process Time & Local Storage Updates ---
     useEffect(() => {
@@ -41,7 +51,6 @@ function App() {
             hasNamedRock: false
         };
 
-        // Trigger first-time setup popup if they haven't adopted their rock yet
         if (!currentData.hasNamedRock) {
             setIsFirstTimeModalOpen(true);
         }
@@ -52,8 +61,11 @@ function App() {
             const missed = total - completed;
 
             if (missed > 0) {
-                currentData.healthPoints = Math.max(0, currentData.healthPoints - (missed * 20));
+                // Apply penalty weight based on current active difficulty state multiplier
+                const weight = difficulty === "EASY" ? 10 : (difficulty === "HARDCORE" ? 30 : 20);
+                currentData.healthPoints = Math.max(0, currentData.healthPoints - (missed * weight));
                 currentData.streakCount = 0;
+                playSound('damage.mp3'); // Plays crunch damage audio alert
             } else if (total > 0 && missed === 0) {
                 currentData.streakCount += 1;
                 currentData.healthPoints = Math.min(100, currentData.healthPoints + 15);
@@ -71,7 +83,7 @@ function App() {
         localStorage.setItem("ROCKSTEADY_DATA", JSON.stringify(currentData));
         setGameState(currentData);
         setTempName(currentData.rockName);
-    }, []);
+    }, [difficulty]);
 
     // --- Speech Text Fading System ---
     useEffect(() => {
@@ -82,7 +94,7 @@ function App() {
         return () => clearTimeout(timer);
     }, [dialogue]);
 
-    // --- Eye Blinking Loop ---
+    // --- Autonomous Eye Blinking Loop ---
     useEffect(() => {
         const blinkInterval = setInterval(() => {
             setIsBlinking(true);
@@ -95,12 +107,12 @@ function App() {
         localStorage.setItem("ROCKSTEADY_DATA", JSON.stringify(updatedState));
         setGameState(updatedState);
     };
-    // --- Habit Check Handler ---
     const toggleHabit = (id) => {
         const habitToToggle = gameState.habits.find(h => h.id === id);
 
         if (habitToToggle && !habitToToggle.isCompletedToday) {
-            // Confetti Splash
+            playSound('success.mp3'); // Play high-chime victory reward audio
+
             confetti({
                 particleCount: 80,
                 spread: 60,
@@ -108,10 +120,11 @@ function App() {
                 colors: ['#FF94E8', '#5CE1E6', '#FFDE4D', '#B6FFA1']
             });
 
-            // Jump Squeeze Physics
             setIsJumping(true);
             setTimeout(() => setIsJumping(false), 600);
             setDialogue("YAY! High discipline energy right there!");
+        } else {
+            playSound('tap.mp3');
         }
 
         const updatedHabits = gameState.habits.map(h =>
@@ -121,6 +134,7 @@ function App() {
     };
 
     const deleteHabit = (id) => {
+        playSound('tap.mp3');
         const updatedHabits = gameState.habits.filter(h => h.id !== id);
         saveState({ ...gameState, habits: updatedHabits });
     };
@@ -133,6 +147,7 @@ function App() {
             return;
         }
 
+        playSound('tap.mp3');
         const newHabit = {
             id: Date.now(),
             title: newHabitTitle,
@@ -148,15 +163,16 @@ function App() {
     };
 
     const handleRockClick = () => {
+        playSound('squish.mp3'); // Play squishy clay speech bubble sound
         setIsTalking(true);
         setTimeout(() => setIsTalking(false), 1200);
 
         const quotes = [
             `Hey! Gentle with the clicks, human!`,
-            `My name is ${gameState.rockName}. Touch the pencil to rename me!`,
+            `My name is ${gameState.rockName}. Use settings to dress me up!`,
             `Daily streak is looking sweet at ${gameState.streakCount}!`,
             `Every checked box fuels my mineral power!`,
-            `Keep working or I'll turn gray and sad tomorrow.`
+            `Current difficulty mode is set to ${difficulty}. Keep pushing!`
         ];
         const randomIndex = Math.floor(Math.random() * quotes.length);
         setDialogue(quotes[randomIndex]);
@@ -164,6 +180,7 @@ function App() {
 
     const saveNewName = () => {
         if (tempName.trim()) {
+            playSound('success.mp3');
             const updated = { ...gameState, rockName: tempName.trim(), hasNamedRock: true };
             saveState(updated);
             setIsEditingName(false);
@@ -173,7 +190,7 @@ function App() {
     };
     return (
         <div className="app-container">
-            {/* Top Header Bar Configuration */}
+            {/* Top Header Row Controls */}
             <div className="header-bar">
                 {isEditingName ? (
                     <div className="name-edit-box">
@@ -195,7 +212,7 @@ function App() {
                 <div className="streak-badge">🔥 {gameState.streakCount}</div>
             </div>
 
-            {/* Health Bar Section */}
+            {/* Metric Loader Health tracking header track */}
             <div className="health-container">
                 <label>HEALTH TRACKER ({gameState.healthPoints}%)</label>
                 <div className="health-bar-bg">
@@ -203,7 +220,7 @@ function App() {
                 </div>
             </div>
 
-            {/* Central Main Gaming View deck panel */}
+            {/* Central Gaming Shell Board character deck layout panel */}
             <div className="rock-area">
                 <div className={`speech-bubble ${isDialogueVisible ? 'fade-in' : 'fade-out'}`}>
                     {dialogue}
@@ -211,12 +228,29 @@ function App() {
 
                 <div
                     className={`pet-rock 
-                        ${gameState.moodState} 
+                        ${gameState.moodState} color-${rockColor}
                         ${isTalking ? 'talking-mouth-anim' : ''} 
                         ${isJumping ? 'jump-active-anim' : 'rock-breathing-idle'}
                     `}
                     onClick={handleRockClick}
                 >
+                    {/* 👑 High-Fidelity Vector-Based Custom Accessories Art Overlay */}
+                    {accessory === "CROWN" && (
+                        <svg className="rock-accessory crown-asset" width="50" height="40" viewBox="0 0 24 24" version="1.1">
+                            <path d="M2,19 L22,19 L20,8 L16,13 L12,5 L8,13 L4,8 Z" fill="#FFD166" stroke="#000" strokeWidth="2.5" strokeLinejoin="round" />
+                            <circle cx="12" cy="4" r="1.5" fill="#FF7B9C" stroke="#000" strokeWidth="1.5" />
+                            <circle cx="3.5" cy="7.5" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1.5" />
+                            <circle cx="20.5" cy="7.5" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1.5" />
+                        </svg>
+                    )}
+                    {accessory === "HAT" && (
+                        <svg className="rock-accessory hat-asset" width="50" height="40" viewBox="0 0 24 24" version="1.1">
+                            <path d="M4,18 C4,15 6,15 7,15 L7,6 C7,5 8,4 10,4 L14,4 C16,4 17,5 17,6 L17,15 C18,15 20,15 20,18 C20,19.5 18,20 12,20 C6,20 4,19.5 4,18 Z" fill="#111111" stroke="#000" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M7,14 L17,14" stroke="#FF7B9C" strokeWidth="3" strokeLinecap="round" /> {/* Fun Pink Ribbon accent */}
+                        </svg>
+                    )}
+
+
                     <div className="eyes-container">
                         <div className={`cartoon-eye ${isBlinking ? 'blink-active' : ''}`}></div>
                         <div className={`cartoon-eye ${isBlinking ? 'blink-active' : ''}`}></div>
@@ -225,7 +259,7 @@ function App() {
                 </div>
             </div>
 
-            {/* --- Tab Screen Selection System Routing Switcher --- */}
+            {/* --- Core Routing Tabs View Switcher Block --- */}
             {activeTab === "HOME" && (
                 <>
                     <div className="habit-header">
@@ -254,12 +288,40 @@ function App() {
             {activeTab === "SETTINGS" && (
                 <div className="subview-panel-container">
                     <h3>SETTINGS</h3>
-                    <div className="setting-card-item">
-                        <span>Hardcore Penalty Decay Mode</span>
-                        <input type="checkbox" defaultChecked />
+
+                    <div className="setting-section-box">
+                        <span className="setting-label">DIFFICULTY DECAY RATE</span>
+                        <div className="setting-pill-row">
+                            <button className={`pill-opt ${difficulty === 'EASY' ? 'selected' : ''}`} onClick={() => { setDifficulty('EASY'); playSound('tap.mp3'); }}>Easy</button>
+                            <button className={`pill-opt ${difficulty === 'NORMAL' ? 'selected' : ''}`} onClick={() => { setDifficulty('NORMAL'); playSound('tap.mp3'); }}>Normal</button>
+                            <button className={`pill-opt ${difficulty === 'HARDCORE' ? 'selected' : ''}`} onClick={() => { setDifficulty('HARDCORE'); playSound('tap.mp3'); }}>Hard</button>
+                        </div>
                     </div>
+
+                    <div className="setting-section-box">
+                        <span className="setting-label">ROCK THEME COLOR</span>
+                        <div className="setting-pill-row">
+                            <button className={`pill-opt ${rockColor === 'ORANGE' ? 'selected' : ''}`} onClick={() => { setRockColor('ORANGE'); playSound('tap.mp3'); }}>Orange</button>
+                            <button className={`pill-opt ${rockColor === 'NEON_BLUE' ? 'selected' : ''}`} onClick={() => { setRockColor('NEON_BLUE'); playSound('tap.mp3'); }}>Blue</button>
+                            <button className={`pill-opt ${rockColor === 'GOLD' ? 'selected' : ''}`} onClick={() => { setRockColor('GOLD'); playSound('tap.mp3'); }}>Gold</button>
+                            <button className={`pill-opt ${rockColor === 'PINK' ? 'selected' : ''}`} onClick={() => { setRockColor('PINK'); playSound('tap.mp3'); }}>Pink</button>
+                            <button className={`pill-opt ${rockColor === 'GREEN' ? 'selected' : ''}`} onClick={() => { setRockColor('GREEN'); playSound('tap.mp3'); }}>Green</button>
+                        </div>
+                    </div>
+
+
+                    <div className="setting-section-box">
+                        <span className="setting-label">DRESS UP ACCESSORIES</span>
+                        <div className="setting-pill-row">
+                            <button className={`pill-opt ${accessory === 'NONE' ? 'selected' : ''}`} onClick={() => { setAccessory('NONE'); playSound('tap.mp3'); }}>None</button>
+                            <button className={`pill-opt ${accessory === 'CROWN' ? 'selected' : ''}`} onClick={() => { setAccessory('CROWN'); playSound('tap.mp3'); }}>Crown</button>
+                            <button className={`pill-opt ${accessory === 'HAT' ? 'selected' : ''}`} onClick={() => { setAccessory('HAT'); playSound('tap.mp3'); }}>Hat</button>
+                        </div>
+                    </div>
+
                     <button className="reset-game-btn" onClick={() => {
-                        if (confirm("Are you sure you want to reset your data?")) {
+                        playSound('tap.mp3');
+                        if (confirm("Are you sure you want to completely erase game data?")) {
                             localStorage.removeItem("ROCKSTEADY_DATA");
                             window.location.reload();
                         }
@@ -273,13 +335,15 @@ function App() {
                 <div className="subview-panel-container">
                     <h3>ABOUT</h3>
                     <p className="about-body-text">
-                        <strong>Rocksteady</strong> is a local-first, privacy-focused utility built with Vite React wrapped inside Capacitor cross-platform plugins.
+                        <strong>Rocksteady</strong> is a Habit Tracker Game that gamifies your daily tasks and habits by giving you a cute pet rock companion. 
+                        Take care of your rock by completing your habits, and watch it thrive! Miss tasks, and your rock's health will decline. 
+                        Customize your rock's appearance and accessories in the settings. 
                     </p>
-                    <span className="version-tag">Version 1.0.0 (Build 2026)</span>
+                    <span className="version-tag">VibeCoded By Tharun Vijay - Version 1.0.0 (Build 2026)</span>
                 </div>
             )}
 
-            {/* Standard Add Habit Popup Overlay form */}
+            {/* Standard Habit Modal Input Card Popup */}
             {isModalOpen && (
                 <div className="modal-overlay">
                     <form className="modal-content" onSubmit={handleAddHabit}>
@@ -293,13 +357,13 @@ function App() {
                 </div>
             )}
 
-            {/* First Time Opening Adoption Popup Card Card */}
+            {/* Adoption Setup Popup Form */}
             {isFirstTimeModalOpen && (
                 <div className="modal-overlay">
                     <div className="modal-content first-time-modal">
                         <h2>WELCOME! 🎉</h2>
                         <p>Adopt your new accountability pet rock. Give them a special name to get started!</p>
-                        <input className="modal-input first-name-field" type="text" placeholder="Name your rock (e.g. Rocky, Pebble...)" value={tempName} onChange={(e) => setNewHabitTitle(e.target.value)} maxLength={12} required />
+                        <input className="modal-input first-name-field" type="text" placeholder="Name your rock (e.g. Rocky...)" value={tempName} onChange={(e) => setTempName(e.target.value)} maxLength={12} required />
                         <button className="save-modal-btn start-game-btn" onClick={saveNewName}>ADOPT PET ROCK 🪨</button>
                     </div>
                 </div>
@@ -307,16 +371,37 @@ function App() {
 
             {/* Floating iOS Style Navigation Control Deck */}
             <div className="footer-buttons">
-                <button className={`footer-btn ${activeTab === "HOME" ? "active-nav" : ""}`} onClick={() => setActiveTab("HOME")}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <button
+                    className={`footer-btn ${activeTab === "HOME" ? "active-nav" : ""}`}
+                    onClick={() => { setActiveTab("HOME"); playSound('tap.mp3'); }}
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
                     <span className="nav-label">Home</span>
                 </button>
-                <button className={`footer-btn ${activeTab === "SETTINGS" ? "active-nav" : ""}`} onClick={() => setActiveTab("SETTINGS")}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+
+                <button
+                    className={`footer-btn ${activeTab === "SETTINGS" ? "active-nav" : ""}`}
+                    onClick={() => { setActiveTab("SETTINGS"); playSound('tap.mp3'); }}
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
                     <span className="nav-label">Settings</span>
                 </button>
-                <button className={`footer-btn ${activeTab === "ABOUT" ? "active-nav" : ""}`} onClick={() => setActiveTab("ABOUT")}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+
+                <button
+                    className={`footer-btn ${activeTab === "ABOUT" ? "active-nav" : ""}`}
+                    onClick={() => { setActiveTab("ABOUT"); playSound('tap.mp3'); }}
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
                     <span className="nav-label">About</span>
                 </button>
             </div>
