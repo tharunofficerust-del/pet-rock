@@ -209,64 +209,87 @@ function App() {
             </div>
             <div className="rock-area">
                 <div className={`speech-bubble ${isDialogueVisible ? 'fade-in' : 'fade-out'}`}>{dialogue}</div>
-                <div className={`pet-rock ${gameState.moodState} color-${gameState.rockColor} ${isTalking ? 'talking-mouth-anim' : ''} ${isJumping ? 'jump-active-anim' : 'rock-breathing-idle'}`} onClick={handleRockClick}>
+                <div
+                    className={`pet-rock 
+        ${gameState.moodState} color-${gameState.rockColor}
+        ${isTalking ? 'talking-mouth-anim' : ''} 
+        ${isJumping ? 'jump-active-anim' : 'rock-breathing-idle'}
+    `}
+                    onClick={handleRockClick}
+                >
+                    {/* 🌿 Vector Sprout Leaf: Renders as high-fidelity cartoon art when 'NONE' is active */}
+                    {gameState.accessory === "NONE" && (
+                        <div className="rock-accessory sprout-leaves-asset">
+                            <svg width="60" height="35" viewBox="0 0 60 35" version="1.1">
+                                <path d="M30,35 L30,22" stroke="#000000" strokeWidth="4" strokeLinecap="round" />
+                                <path d="M30,22 C15,12 10,24 5,16 C10,4 25,12 30,22 Z" fill="#B6FFA1" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
+                                <path d="M30,22 C45,12 50,24 55,16 C50,4 35,12 30,22 Z" fill="#B6FFA1" stroke="#000000" strokeWidth="3" strokeLinejoin="round" />
+                                <path d="M12,18 C18,15 24,18 27,21" stroke="#5EBC3F" strokeWidth="2" strokeLinecap="round" fill="none" />
+                                <path d="M48,18 C42,15 36,18 33,21" stroke="#5EBC3F" strokeWidth="2" strokeLinecap="round" fill="none" />
+                            </svg>
+                        </div>
+                    )}
 
+                    {/* 👑 Other Dynamic Accessories Overlays */}
+                    {/* Accessories Overlays with Re-calculated Baselines */}
                     {gameState.accessory === "CROWN" && (
-                        <svg className="rock-accessory crown-asset" width="50" height="40" viewBox="0 0 24 24">
-                            <path d="M2,19 L22,19 L20,8 L16,13 L12,5 L8,13 L4,8 Z" fill="#FFD166" stroke="#000" strokeWidth="2.5" strokeLinejoin="round" />
-                            <circle cx="12" cy="4" r="1.5" fill="#FF7B9C" stroke="#000" strokeWidth="1.5" /><circle cx="3.5" cy="7.5" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1.5" /><circle cx="20.5" cy="7.5" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1.5" />
+                        <svg className="rock-accessory crown-asset" width="56" height="42" viewBox="0 0 24 24" version="1.1">
+                            {/* Thick block shadow backing */}
+                            <path d="M2,19 L22,19 L20,7 L16,12 L12,4 L8,12 L4,7 Z" fill="#000" />
+                            {/* Main Yellow Crown Body */}
+                            <path d="M3,18 L21,18 L19,8 L15,13 L12,5 L9,13 L5,8 Z" fill="#FFD166" stroke="#000" strokeWidth="2.5" strokeLinejoin="round" />
+                            {/* Ruby and Sapphire gems details */}
+                            <circle cx="12" cy="5" r="1.5" fill="#FF7B9C" stroke="#000" strokeWidth="1" />
+                            <circle cx="5" cy="8" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1" />
+                            <circle cx="19" cy="8" r="1.5" fill="#5CE1E6" stroke="#000" strokeWidth="1" />
+                            <rect x="7" y="15" width="3" height="3" fill="#FF7B9C" rx="0.5" />
+                            <rect x="14" y="15" width="3" height="3" fill="#5CE1E6" rx="0.5" />
                         </svg>
                     )}
                     {gameState.accessory === "HAT" && (
-                        <svg className="rock-accessory hat-asset" width="50" height="40" viewBox="0 0 24 24">
-                            <path d="M4,18 C4,15 6,15 7,15 L7,6 C7,5 8,4 10,4 L14,4 C16,4 17,5 17,6 L17,15 C18,15 20,15 20,18 C20,19.5 18,20 12,20 C6,20 4,19.5 4,18 Z" fill="#111111" stroke="#000" strokeWidth="2" strokeLinejoin="round" />
-                            <path d="M7,14 L17,14" stroke="#FF7B9C" strokeWidth="3" strokeLinecap="round" />
+                        <svg className="rock-accessory hat-asset" width="55" height="42" viewBox="0 0 24 24" version="1.1">
+                            <path d="M3,18 C3,15 5,15 6,15 L6,6 C6,5 7,4 9,4 L15,4 C17,4 18,5 18,6 L18,15 C19,15 21,15 21,18 C21,19.5 19,20 12,20 C5,20 3,19.5 3,18 Z" fill="#111111" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round" />
+                            <path d="M6,14 L18,14" stroke="#FF7B9C" strokeWidth="3.5" strokeLinecap="round" />
                         </svg>
                     )}
                     {gameState.accessory === "PARTY" && (
-                        <svg className="rock-accessory party-asset" width="55" height="55" viewBox="0 0 24 24">
-                            {/* Bold black shadow backing block */}
+                        <svg className="rock-accessory party-asset" width="55" height="55" viewBox="0 0 24 24" version="1.1">
                             <path d="M12,1 L2.5,19.5 L21.5,19.5 Z" fill="#000000" />
-                            {/* Main Cone Base */}
                             <path d="M12,2 L3,19 L21,19 Z" fill="#FF94E8" stroke="#000000" strokeWidth="2.5" strokeLinejoin="round" />
-                            {/* Vibrant Comic Stripes */}
                             <path d="M6.5,13 L14.5,7" stroke="#FFDE4D" strokeWidth="3" strokeLinecap="round" />
                             <path d="M9.5,17 L18,11" stroke="#5CE1E6" strokeWidth="3" strokeLinecap="round" />
-                            {/* Fluffy Pom-Pom Puff Ball Top */}
                             <circle cx="12" cy="2" r="3" fill="#FFDE4D" stroke="#000000" strokeWidth="2.5" />
                         </svg>
                     )}
-
                     {gameState.accessory === "GLASSES" && (
-                        <svg className="rock-accessory glasses-asset" width="90" height="30" viewBox="0 0 90 30" version="1.1">
-                            {/* Bold black structural connecting bridge frame line */}
-                            <rect x="25" y="8" width="40" height="5" fill="#000000" />
-
-                            {/* Left Round Cartoon Lens Layer */}
-                            <circle cx="20" cy="15" r="14" fill="#000000" />
-                            <circle cx="20" cy="15" r="11" fill="#111111" />
-                            {/* Left Lens Glass Glare Streak */}
-                            <path d="M14,11 L22,7" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
-
-                            {/* Right Round Cartoon Lens Layer */}
-                            <circle cx="70" cy="15" r="14" fill="#000000" />
-                            <circle cx="70" cy="15" r="11" fill="#111111" />
-                            {/* Right Lens Glass Glare Streak */}
-                            <path d="M64,11 L72,7" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
-                        </svg>
+                        <div className="premium-glasses-rig">
+                            <svg width="106" height="36" viewBox="0 0 106 36" version="1.1">
+                                <rect x="25" y="11" width="56" height="6" fill="#000000" rx="3" />
+                                <circle cx="23" cy="17" r="16" fill="#000000" />
+                                <circle cx="23" cy="17" r="12" fill="#111111" />
+                                <path d="M15,14 C19,10 23,12 25,15" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+                                <circle cx="83" cy="17" r="16" fill="#000000" />
+                                <circle cx="83" cy="17" r="12" fill="#111111" />
+                                <path d="M75,14 C79,10 83,12 85,15" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+                            </svg>
+                        </div>
                     )}
 
 
-
+                    {/* Symmetric Cheek Element Duos */}
                     <div className="rock-blush blush-left"></div>
                     <div className="rock-blush blush-right"></div>
 
+                    {/* Central Sparkly Eyes Layout Container */}
                     <div className="eyes-container">
                         <div className={`cartoon-eye ${isBlinking ? 'blink-active' : ''}`}></div>
                         <div className={`cartoon-eye ${isBlinking ? 'blink-active' : ''}`}></div>
                     </div>
+
+                    {/* The Talking Mouth element */}
                     <div className="cartoon-mouth"></div>
                 </div>
+
             </div>
 
             {activeTab === "HOME" && (

@@ -125,14 +125,12 @@ body {
     transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* 🆕 Central Panel Overhaul: Includes Premium Comic Book Polka Dot/Grid Pattern */
 .rock-area {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    /* Generates an elegant cartoony offline repeating checker pattern */
     background-color: #B6FFA1 !important;
     background-image: radial-gradient(#9CEE87 20%, transparent 20%),
         radial-gradient(#9CEE87 20%, transparent 20%) !important;
@@ -190,46 +188,160 @@ body {
 }
 
 .pet-rock {
-    width: 135px;
-    height: 120px;
+    width: 125px;
+    height: 115px;
     border: 4px solid #000000;
-    border-radius: 54% 46% 50% 50% / 60% 60% 40% 40%;
-    background: radial-gradient(circle at 35% 30%, #FFA87D 0%, #FF9E6E 40%, #E07A48 100%) !important;
+    border-radius: 50% 50% 46% 46% / 60% 60% 40% 40%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 5px 8px 0px rgba(0, 0, 0, 0.15);
     cursor: pointer;
     position: relative;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* 🆕 Complex Character Idle Rotation + Shifting Animation */
-.rock-breathing-idle {
-    animation: professionalIdle 3.5s ease-in-out infinite;
+.sprout-leaves-asset {
+    position: absolute;
+    top: -30px;
+    left: 28px;
+    z-index: 15;
+    filter: drop-shadow(4px 4px 0px #000000);
 }
 
-@keyframes professionalIdle {
+/* ==========================================
+   THE 4 HIGH-CONTRAST VISUAL STAGES MODIFIERS
+   ========================================== */
+
+/* State 1: HAPPY (100% - 81% HP) - Bold Solid Colors */
+.pet-rock.color-ORANGE.HAPPY {
+    background: #FFB38A !important;
+    box-shadow: inset -8px -8px 0px #E69D75, 4px 6px 0px rgba(0, 0, 0, 0.15);
+}
+
+.pet-rock.color-NEON_BLUE.HAPPY {
+    background: #5CE1E6 !important;
+    box-shadow: inset -8px -8px 0px #3CBCC0, 4px 6px 0px rgba(0, 0, 0, 0.15);
+}
+
+.pet-rock.color-GOLD.HAPPY {
+    background: #FFDE4D !important;
+    box-shadow: inset -8px -8px 0px #CCA000, 4px 6px 0px rgba(0, 0, 0, 0.15);
+}
+
+.pet-rock.color-PINK.HAPPY {
+    background: #FF94E8 !important;
+    box-shadow: inset -8px -8px 0px #B2256B, 4px 6px 0px rgba(0, 0, 0, 0.15);
+}
+
+.pet-rock.color-GREEN.HAPPY {
+    background: #B6FFA1 !important;
+    box-shadow: inset -8px -8px 0px #146C43, 4px 6px 0px rgba(0, 0, 0, 0.15);
+}
+
+/* State 2: BORED (80% - 51% HP) - Dull Flat Matte Gray */
+.pet-rock.BORED {
+    background: #A5A5A5 !important;
+    box-shadow: inset -8px -8px 0px #8C8C8C, 4px 6px 0px rgba(0, 0, 0, 0.15);
+}
+
+.pet-rock.BORED .cartoon-mouth {
+    width: 16px;
+    height: 3px;
+    border-radius: 0;
+    background: #000000;
+}
+
+.pet-rock.BORED .cartoon-eye::after {
+    width: 14px;
+    height: 14px;
+    top: 1px;
+    left: 0px;
+}
+
+/* State 3: DEPRESSED (50% - 16% HP) - Fast Nervous Shaking Blue */
+.pet-rock.DEPRESSED {
+    background: #6998FF !important;
+    box-shadow: inset -8px -8px 0px #5381ED, 4px 6px 0px rgba(0, 0, 0, 0.15);
+    animation: nervousShiver 0.15s infinite linear;
+}
+
+.pet-rock.DEPRESSED .cartoon-mouth {
+    width: 18px;
+    height: 8px;
+    border-radius: 12px 12px 0 0;
+    border-bottom: none;
+    border-top: 3px solid #000000;
+}
+
+@keyframes nervousShiver {
     0% {
-        transform: translateY(0px) scale(1) rotate(0deg);
-    }
-
-    30% {
-        transform: translateY(-3px) scale(1.02) rotate(-1deg);
-        border-radius: 52% 48% 48% 52% / 58% 58% 42% 42%;
-    }
-
-    65% {
-        transform: translateY(1px) scale(0.99) rotate(1deg);
-        border-radius: 55% 45% 52% 48% / 62% 62% 38% 38%;
+        transform: translate(1px, 1px) rotate(0.5deg);
     }
 
     100% {
-        transform: translateY(0px) scale(1) rotate(0deg);
+        transform: translate(-1px, -1px) rotate(-0.5deg);
     }
 }
 
-/* 🆕 Bouncy Spring Jump-Squeeze Animation on Task Complete */
+/* State 4: CRACKED / SICK (15% - 0% HP) - Pale Slate Skin, Cross Eyes (✕ ✕), No Sparkles */
+.pet-rock.CRACKED {
+    background: #DCE5EB !important;
+    box-shadow: inset -8px -8px 0px #C0C9D0, 4px 6px 0px rgba(0, 0, 0, 0.15);
+}
+
+.pet-rock.CRACKED .cartoon-eye {
+    background: transparent !important;
+    border: none !important;
+}
+
+.pet-rock.CRACKED .cartoon-eye::after {
+    content: '✕';
+    font-family: sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #000;
+    background: transparent;
+    width: auto;
+    height: auto;
+    top: -2px;
+    left: -1px;
+}
+
+.pet-rock.CRACKED .cartoon-eye::before {
+    display: none !important;
+}
+
+.pet-rock.CRACKED .rock-blush {
+    opacity: 0.25;
+}
+
+.pet-rock.CRACKED .cartoon-mouth {
+    width: 20px;
+    height: 4px;
+    border: 3px solid #000;
+    border-radius: 50%;
+    background: #000;
+}
+
+.rock-breathing-idle {
+    animation: bounceMovement 2.5s ease-in-out infinite;
+}
+
+@keyframes bounceMovement {
+    0% {
+        transform: translateY(0px) scale(1);
+    }
+
+    50% {
+        transform: translateY(-5px) scale(1.02);
+    }
+
+    100% {
+        transform: translateY(0px) scale(1);
+    }
+}
+
 .jump-active-anim {
     animation: highStakesJump 0.6s cubic-bezier(0.25, 1, 0.5, 1) 1;
 }
@@ -240,7 +352,7 @@ body {
     }
 
     35% {
-        transform: translateY(-45px) scaleY(1.2) scaleX(0.85) rotate(5deg);
+        transform: translateY(-45px) scaleY(1.2) scaleX(0.85);
     }
 
     70% {
@@ -248,24 +360,24 @@ body {
     }
 
     100% {
-        transform: translateY(0px) scale(1) rotate(0deg);
+        transform: translateY(0px) scale(1);
     }
 }
 
 .eyes-container {
     display: flex;
-    gap: 20px;
+    gap: 18px;
     margin-bottom: 6px;
+    z-index: 10;
 }
 
 .cartoon-eye {
-    width: 22px;
-    height: 26px;
+    width: 16px;
+    height: 20px;
     background: #FFFFFF !important;
-    border: 3.5px solid #000000;
+    border: 3px solid #000000;
     border-radius: 50%;
     position: relative;
-    z-index: 5;
 }
 
 .cartoon-eye::after {
@@ -275,8 +387,8 @@ body {
     height: 12px;
     background: #000000;
     border-radius: 50%;
-    top: 3px;
-    left: 2px;
+    top: 2px;
+    left: 1px;
 }
 
 .cartoon-eye::before {
@@ -286,50 +398,33 @@ body {
     height: 4px;
     background: #FFFFFF !important;
     border-radius: 50%;
-    top: 5px;
-    left: 4px;
-    z-index: 6;
+    top: 4px;
+    left: 3px;
+    z-index: 12;
 }
 
-/* --- 🎨 5 Premium Neo-Brutalist Color Themes (Fixed Gradients) --- */
-.pet-rock.color-ORANGE {
-    background: radial-gradient(circle at 35% 30%, #FFA87D 0%, #FF9E6E 40%, #E07A48 100%) !important;
-    box-shadow: inset -8px -8px 0px #E69D75, 4px 6px 0px rgba(0,0,0,0.15);
-}
-.pet-rock.color-NEON_BLUE {
-    background: radial-gradient(circle at 35% 30%, #A0F4FF 0%, #5CE1E6 40%, #20A5A9 100%) !important;
-    box-shadow: inset -8px -8px 0px #3CBCC0, 4px 6px 0px rgba(0,0,0,0.15);
-}
-.pet-rock.color-GOLD {
-    background: radial-gradient(circle at 35% 30%, #FFF59D 0%, #FFD54F 40%, #E6A100 100%) !important;
-    box-shadow: inset -8px -8px 0px #CCA000, 4px 6px 0px rgba(0,0,0,0.15);
-}
-.pet-rock.color-PINK {
-    background: radial-gradient(circle at 35% 30%, #FFC4E1 0%, #FF82C1 40%, #D63384 100%) !important;
-    box-shadow: inset -8px -8px 0px #B2256B, 4px 6px 0px rgba(0,0,0,0.15);
-}
-.pet-rock.color-GREEN {
-    background: radial-gradient(circle at 35% 30%, #D4FFDF 0%, #4B847D 40%, #198754 100%) !important;
-    box-shadow: inset -8px -8px 0px #146C43, 4px 6px 0px rgba(0,0,0,0.15);
+.cartoon-eye.blink-active {
+    height: 4px;
+    background: #000000 !important;
+    margin-top: 12px;
 }
 
+.cartoon-eye.blink-active::after,
+.cartoon-eye.blink-active::before {
+    display: none !important;
+}
 
-
-/* --- 🛠️ 100% Fixed Facial Blending Blush Effect --- */
-/* --- 🛠️ 100% Fixed Dual Cartoon Cheek Blush (No Layout Bleeding) --- */
-/* --- 🛠️ 100% Perfect Dual Cartoon Cheek Elements (Zero Bleeding) --- */
 .rock-blush {
     position: absolute;
     width: 14px;
     height: 14px;
-    background: #FF7B9C !important; /* Soft premium pastel rose pink from our theme */
+    background: #FF7B9C !important;
     border: 3.5px solid #000000;
     border-radius: 50%;
     top: 54px;
-    z-index: 1; /* Pushes blush deep underneath eyes and mouth layers safely */
+    z-index: 5;
 }
 
-/* Absolute spatial placement coordinates matching face layout lines */
 .blush-left {
     left: 20px;
 }
@@ -338,48 +433,14 @@ body {
     right: 20px;
 }
 
-
-/* --- 👑 Custom SVG Vector Accessories Anchors --- */
-.rock-accessory {
-    position: absolute;
-    z-index: 10;
-    pointer-events: none;
-    overflow: visible;
-}
-.crown-asset {
-    top: -24px;
-    left: 42px;
-    transform: rotate(-6deg);
-    filter: drop-shadow(3px 3px 0px #000);
-}
-.hat-asset {
-    top: -26px;
-    left: 42px;
-    transform: rotate(4deg);
-    filter: drop-shadow(4px 3px 0px #000);
-}
-
-
-.cartoon-eye.blink-active {
-    height: 4px;
-    background: #000000 !important;
-    margin-top: 10px;
-}
-
-.cartoon-eye.blink-active::after,
-.cartoon-eye.blink-active::before {
-    display: none !important;
-}
-
 .cartoon-mouth {
-    width: 20px;
-    height: 12px;
-    border: 3.5px solid #000000;
-    border-radius: 0 0 14px 14px;
+    width: 22px;
+    height: 8px;
+    border: 3px solid #000000;
+    border-radius: 0 0 12px 12px;
     border-top: none;
     background: transparent;
-    z-index: 2;
-    transition: height 0.15s ease;
+    z-index: 8;
 }
 
 .talking-mouth-anim .cartoon-mouth {
@@ -400,40 +461,49 @@ body {
     }
 }
 
-.pet-rock.BORED {
-    background: #A3B18A !important;
-    box-shadow: inset -8px -8px 0px #8F9E77;
+/* --- 🛠️ Re-Centered Accessory Spatial Coordinates (Pushed Left) --- */
+.rock-accessory {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+    overflow: visible;
 }
 
-.pet-rock.BORED .cartoon-mouth {
-    width: 16px;
-    height: 3px;
-    border-radius: 0;
-    background: #000000;
+.crown-asset {
+    top: -26px;
+    left: 31px;         /* Pushed left from 36px to fix the rightward bias */
+    transform: rotate(-4deg);
+    filter: drop-shadow(4px 4px 0px #000000);
 }
 
-.pet-rock.DEPRESSED {
-    background: #778DA9 !important;
-    box-shadow: inset -8px -8px 0px #637791;
-    animation: nervousShiver 0.3s infinite;
+.hat-asset {
+    top: -28px;
+    left: 31px;         /* Aligned matching the crown's center axis */
+    transform: rotate(3deg);
+    filter: drop-shadow(4px 4px 0px #000000);
 }
 
-.pet-rock.DEPRESSED .cartoon-mouth {
-    width: 18px;
-    height: 8px;
-    border-radius: 12px 12px 0 0;
-    border-bottom: none;
-    border-top: 3px solid #000000;
+.party-asset {
+    top: -34px;
+    left: 31px;         /* Pushed left from 35px to align the party cone cone */
+    transform: rotate(-2deg);
+    filter: drop-shadow(4px 4px 0px #000000);
 }
 
-@keyframes nervousShiver {
-    0% {
-        transform: translate(1px, 0px);
-    }
+/* Round Sunglasses Rig Realignment */
+.premium-glasses-rig {
+    position: absolute;
+    top: 29px;          
+    left: 6px;          /* Pushed left from 10px to seat the frames directly over the pupils */
+    z-index: 30;
+    filter: drop-shadow(4px 4px 0px #000000);
+}
 
-    100% {
-        transform: translate(-1px, 1px);
-    }
+
+.party-asset {
+    top: -34px;
+    left: 42px;
+    transform: rotate(-2deg);
 }
 
 .habit-header {
@@ -461,7 +531,7 @@ body {
     color: #000000;
     cursor: pointer;
     box-shadow: 4px 4px 0px #000000;
-    transition: transform 0.08s, box-shadow 0.08s;
+    transition: transform 0.08s;
 }
 
 .add-btn:active {
@@ -562,13 +632,6 @@ body {
     font-weight: 900;
     cursor: pointer;
     box-shadow: 3px 3px 0px #000000;
-    transition: transform 0.05s, box-shadow 0.05s;
-}
-
-.cancel-modal-btn:active,
-.save-modal-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 0px 0px 0px #000000;
 }
 
 .cancel-modal-btn {
@@ -579,7 +642,6 @@ body {
     background: #B6FFA1 !important;
 }
 
-/* 🆕 Adoption First Time Specific Styling Override */
 .first-time-modal h2 {
     font-family: 'Lexend Mega', sans-serif;
     font-weight: 900;
@@ -603,6 +665,96 @@ body {
     font-size: 0.8rem;
     background: #FF94E8 !important;
     margin-top: 5px;
+}
+
+.subview-panel-container {
+    padding: 16px 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.subview-panel-container h3 {
+    font-family: 'Lexend Mega', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #000;
+    margin-bottom: 4px;
+}
+
+.setting-section-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.setting-label {
+    font-family: 'Lexend Mega', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #555;
+    text-transform: uppercase;
+}
+
+.setting-pill-row {
+    display: flex;
+    gap: 6px;
+    background: #000000;
+    padding: 4px;
+    border-radius: 14px;
+}
+
+.pill-opt {
+    flex: 1;
+    padding: 6px 2px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: #FFFFFF;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.pill-opt.selected {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    border: 2px solid #000000;
+    box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.2);
+}
+
+.reset-game-btn {
+    margin-top: 10px;
+    padding: 12px;
+    background: #FF94E8 !important;
+    border: 3px solid #000;
+    border-radius: 16px;
+    font-family: 'Lexend Mega', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.about-body-text {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #222;
+}
+
+.version-tag {
+    font-family: 'Lexend Mega', sans-serif;
+    font-size: 0.55rem;
+    color: #666;
+    margin-top: auto;
 }
 
 .footer-buttons {
@@ -633,7 +785,7 @@ body {
     justify-content: center;
     gap: 4px;
     box-shadow: 0px 4px 0px #000000;
-    transition: transform 0.05s, box-shadow 0.05s;
+    transition: transform 0.05s;
 }
 
 .footer-btn:active {
@@ -658,158 +810,3 @@ body {
     font-size: 0.55rem;
     text-transform: uppercase;
 }
-
-/* 🛠️ Neo-Brutalist Settings and About subviews design layout rules */
-.subview-panel-container {
-    padding: 16px 20px;
-    flex-grow: 1;
-    overflow-y: auto;
-    max-height: 250px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.subview-panel-container h3 {
-    font-family: 'Lexend Mega', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 900;
-    color: #000;
-    margin-bottom: 4px;
-}
-
-.setting-card-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 3px solid #000;
-    background: #FFFFFF !important;
-    padding: 12px;
-    border-radius: 16px;
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    box-shadow: 4px 4px 0px #000;
-}
-
-.setting-card-item input[type="checkbox"] {
-    width: 22px;
-    height: 22px;
-    accent-color: #000;
-    cursor: pointer;
-}
-
-.reset-game-btn {
-    margin-top: 10px;
-    padding: 12px;
-    background: #FF94E8 !important; /* Bold neon pink */
-    border: 3px solid #000;
-    border-radius: 16px;
-    font-family: 'Lexend Mega', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 900;
-    cursor: pointer;
-    box-shadow: 4px 4px 0px #000;
-    transition: transform 0.05s, box-shadow 0.05s;
-}
-
-.reset-game-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 0px 0px 0px #000;
-}
-
-.about-body-text {
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    font-size: 0.9rem;
-    line-height: 1.4;
-    color: #222;
-}
-
-.version-tag {
-    font-family: 'Lexend Mega', sans-serif;
-    font-size: 0.55rem;
-    color: #666;
-    margin-top: auto;
-}
-/* --- Color Theme Modifiers --- */
-.pet-rock.color-ORANGE {
-    background: radial-gradient(circle at 35% 30%, #FFA87D 0%, #FF9E6E 40%, #E07A48 100%) !important;
-    box-shadow: inset -8px -8px 0px #E69D75, 4px 6px 0px rgba(0,0,0,0.15);
-}
-.pet-rock.color-NEON_BLUE {
-    background: radial-gradient(circle at 35% 30%, #A0F4FF 0%, #5CE1E6 50%, #00A4A6 100%) !important;
-    box-shadow: inset -8px -8px 0px #3CBCC0, 4px 6px 0px rgba(0,0,0,0.15);
-}
-.pet-rock.color-GOLD {
-    background: radial-gradient(circle at 35% 30%, #FFF59D 0%, #FFD54F 50%, #FFB300 100%) !important;
-    box-shadow: inset -8px -8px 0px #E6B800, 4px 6px 0px rgba(0,0,0,0.15);
-}
-
-/* --- Accessories Overlay Anchors --- */
-.rock-accessory {
-    position: absolute;
-    font-size: 2.5rem;
-    z-index: 10;
-    pointer-events: none;
-    filter: drop-shadow(3px 3px 0px #000);
-}
-.crown-asset { top: -28px; left: 34px; transform: rotate(-5deg); }
-.hat-asset { top: -32px; left: 36px; transform: rotate(3deg); }
-
-/* --- Settings Grid Layout Extensions --- */
-.setting-section-box {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 4px;
-}
-.setting-label {
-    font-family: 'Lexend Mega', sans-serif;
-    font-size: 0.65rem;
-    font-weight: 900;
-    color: #555;
-    text-transform: uppercase;
-}
-.setting-pill-row {
-    display: flex;
-    gap: 6px;
-    background: #000000;
-    padding: 4px;
-    border-radius: 14px;
-}
-.pill-opt {
-    flex: 1;
-    padding: 6px 2px;
-    border: 2px solid transparent;
-    border-radius: 10px;
-    background: transparent;
-    color: #FFFFFF;
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 700;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: all 0.1s ease;
-}
-.pill-opt.selected {
-    background: #FFFFFF !important;
-    color: #000000 !important;
-    border: 2px solid #000000;
-    box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
-}
-
-/* --- New Custom Accessories Placements --- */
-.party-asset {
-    top: -30px;        /* Pulls it slightly lower onto the stone surface */
-    left: 40px;        /* Horizontal alignment matching the crown/hat profile */
-    z-index: 10;
-    filter: drop-shadow(4px 4px 0px #000000); /* Neo-brutalist cartoon shadow profile */
-}
-
-.glasses-asset {
-    top: 24px;         /* Keeps the vertical position sitting cleanly on the eyes */
-    left: 26px;        /* 🛠️ Shifts it 4 pixels to the right to center perfectly */
-    z-index: 25;
-    filter: drop-shadow(4px 4px 0px #000000);
-}
-
