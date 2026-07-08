@@ -1,5 +1,5 @@
 # Master Codemagic Compilation Script for Pet Pebble
-# Configured for Nested Java/Capacitor Build Environments (Java JDK 17 Configuration)
+# Configured for Nested Java/Capacitor Build Environments (Java JDK 21 Configuration)
 workflows:
   android-workflow:
     name: Android Capacitor Production Build
@@ -26,8 +26,8 @@ workflows:
           npx cap sync android
       - name: Compile Standalone Production APK Package
         script: |
-          # 🆕 FIXED: Force the build machine to use Java 17/21 to resolve plugin compilation limits
-          export JAVA_HOME=$JAVA_HOME_17
+          # Force the environment to load Java 21 variables directly to pass plugin constraints
+          export JAVA_HOME=$JAVA_HOME_21
           export PATH=$JAVA_HOME/bin:$PATH
           java -version
           
@@ -38,12 +38,11 @@ workflows:
     publishing:
       email:
         recipients:
-          - tharunrust@gmail.com # Automatically sends the APK directly to your email inbox!
-          - tharunofficerust@gmail.com # Automatically sends the APK directly to your email inbox!
+          - tharunrust@gmail.com
+          - tharunofficerust@gmail.com
         notify:
           success: true
           failure: true
-
 
 # - tharunrust@gmail.com # Automatically sends the APK directly to your email inbox!
 # - tharunofficerust@gmail.com # Automatically sends the APK directly to your email inbox!
