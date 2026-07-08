@@ -1,5 +1,5 @@
 # Master Codemagic Compilation Script for Pet Pebble
-# Configured for Nested Java/Capacitor Build Environments (Java JDK 21 Strict Target Configuration)
+# Final Production Version (Java 21 Stable Native Pipeline)
 workflows:
   android-workflow:
     name: Android Capacitor Production Build
@@ -17,10 +17,8 @@ workflows:
           if [ -s "$NVM_DIR/nvm.sh" ]; then . "$NVM_DIR/nvm.sh"; fi
           
           nvm use 20 || nvm install 20
-          node --version
           
           cd src/main/resources/static/rocksteady-app
-          
           npm install --legacy-peer-deps
           npx vite build
           npx cap sync android
@@ -32,17 +30,15 @@ workflows:
           
           cd src/main/resources/static/rocksteady-app/android
           
-          # 🛠️ HARD HARDWARE ENFORCEMENT: Updates underlying Gradle files to force compiler options to match Java 21 options
-          if [ -f "build.gradle" ]; then
-            sed -i '' 's/JavaVersion.VERSION_17/JavaVersion.VERSION_21/g' build.gradle 2>/dev/null || true
-            sed -i '' 's/JavaVersion.VERSION_11/JavaVersion.VERSION_21/g' build.gradle 2>/dev/null || true
-          fi
-          if [ -f "app/build.gradle" ]; then
-            sed -i '' 's/JavaVersion.VERSION_17/JavaVersion.VERSION_21/g' app/build.gradle 2>/dev/null || true
-            sed -i '' 's/JavaVersion.VERSION_11/JavaVersion.VERSION_21/g' app/build.gradle 2>/dev/null || true
-          fi
+          # 🛠️ HARDWARE DRIVER BYPASS: Locks the project configuration properties to clear native wrapper crashes
+          mkdir -p .gradle
+          echo "org.gradle.java.home=$JAVA_HOME_21" > gradle.properties
+          echo "org.gradle.daemon=false" >> gradle.properties
+          echo "org.gradle.caching=false" >> gradle.properties
           
-          ./gradlew assembleDebug --no-daemon
+          # Clean out old build configurations and run the pure single-thread compiler
+          ./gradlew clean --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
     artifacts:
       - src/main/resources/static/rocksteady-app/android/app/build/outputs/apk/**/*.apk
     publishing:
@@ -53,6 +49,3 @@ workflows:
         notify:
           success: true
           failure: true
-
-# - tharunrust@gmail.com # Automatically sends the APK directly to your email inbox!
-# - tharunofficerust@gmail.com # Automatically sends the APK directly to your email inbox!
