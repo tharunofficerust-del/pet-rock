@@ -1,5 +1,5 @@
 # Master Codemagic Compilation Script for Pet Pebble
-# Configured for Nested Java/Capacitor Build Environments (Java JDK 21 Configuration)
+# Configured for Nested Java/Capacitor Build Environments (Java JDK 21 Strict Target Configuration)
 workflows:
   android-workflow:
     name: Android Capacitor Production Build
@@ -26,13 +26,23 @@ workflows:
           npx cap sync android
       - name: Compile Standalone Production APK Package
         script: |
-          # Force the environment to load Java 21 variables directly to pass plugin constraints
           export JAVA_HOME=$JAVA_HOME_21
           export PATH=$JAVA_HOME/bin:$PATH
           java -version
           
           cd src/main/resources/static/rocksteady-app/android
-          ./gradlew assembleDebug
+          
+          # 🛠️ HARD HARDWARE ENFORCEMENT: Updates underlying Gradle files to force compiler options to match Java 21 options
+          if [ -f "build.gradle" ]; then
+            sed -i '' 's/JavaVersion.VERSION_17/JavaVersion.VERSION_21/g' build.gradle 2>/dev/null || true
+            sed -i '' 's/JavaVersion.VERSION_11/JavaVersion.VERSION_21/g' build.gradle 2>/dev/null || true
+          fi
+          if [ -f "app/build.gradle" ]; then
+            sed -i '' 's/JavaVersion.VERSION_17/JavaVersion.VERSION_21/g' app/build.gradle 2>/dev/null || true
+            sed -i '' 's/JavaVersion.VERSION_11/JavaVersion.VERSION_21/g' app/build.gradle 2>/dev/null || true
+          fi
+          
+          ./gradlew assembleDebug --no-daemon
     artifacts:
       - src/main/resources/static/rocksteady-app/android/app/build/outputs/apk/**/*.apk
     publishing:
