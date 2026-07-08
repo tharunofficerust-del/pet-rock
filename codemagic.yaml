@@ -46,3 +46,5 @@ workflows:
           success: true
           failure: true
 
+# - tharunrust@gmail.com # Automatically sends the APK directly to your email inbox!
+# - tharunofficerust@gmail.com # Automatically sends the APK directly to your email inbox!
