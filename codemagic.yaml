@@ -1,5 +1,5 @@
 # Master Codemagic Compilation Script for Pet Pebble
-# Configured for Nested Java/Capacitor Build Environments (Fully Unified Step Track)
+# Configured for Nested Java/Capacitor Build Environments (Java JDK 17 Configuration)
 workflows:
   android-workflow:
     name: Android Capacitor Production Build
@@ -13,24 +13,26 @@ workflows:
     scripts:
       - name: Build Web Application Bundle Layers & Sync Workspace
         script: |
-          # 1. Force source the native terminal environment profiles
           if [ -s "$HOME/.nvm/nvm.sh" ]; then . "$HOME/.nvm/nvm.sh"; fi
           if [ -s "$NVM_DIR/nvm.sh" ]; then . "$NVM_DIR/nvm.sh"; fi
           
           nvm use 20 || nvm install 20
           node --version
           
-          # 📂 2. Navigate directly into your nested frontend project sub-workspace folder
           cd src/main/resources/static/rocksteady-app
           
-          # 📦 3. Run full packaging pipeline sequentially in one unbroken chain
           npm install --legacy-peer-deps
           npx vite build
           npx cap sync android
       - name: Compile Standalone Production APK Package
         script: |
-          # 📂 Android folder is nested inside the frontend subdirectory path axis
-          cd src/main/resources/static/rocksteady-app/android && ./gradlew assembleDebug
+          # 🆕 FIXED: Force the build machine to use Java 17/21 to resolve plugin compilation limits
+          export JAVA_HOME=$JAVA_HOME_17
+          export PATH=$JAVA_HOME/bin:$PATH
+          java -version
+          
+          cd src/main/resources/static/rocksteady-app/android
+          ./gradlew assembleDebug
     artifacts:
       - src/main/resources/static/rocksteady-app/android/app/build/outputs/apk/**/*.apk
     publishing:
@@ -41,6 +43,7 @@ workflows:
         notify:
           success: true
           failure: true
+
 
 # - tharunrust@gmail.com # Automatically sends the APK directly to your email inbox!
 # - tharunofficerust@gmail.com # Automatically sends the APK directly to your email inbox!
