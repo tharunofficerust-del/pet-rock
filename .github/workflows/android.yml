@@ -1,0 +1,41 @@
+name: Android Capacitor Build Pipeline
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java JDK 17 Environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Compile Frontend Web Bundle Layers
+        run: |
+          cd src/main/resources/static/rocksteady-app
+          npm install --legacy-peer-deps
+          npx vite build
+          npx cap sync android
+
+      - name: Compile Standalone Production APK Package
+        run: |
+          cd src/main/resources/static/rocksteady-app/android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload Finished APK Artifact File
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pet-Pebble-App
+          path: src/main/resources/static/rocksteady-app/android/app/build/outputs/apk/debug/app-debug.apk
