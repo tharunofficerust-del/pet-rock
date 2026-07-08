@@ -65,3 +65,19 @@ try {
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
+
+
+/* ==========================================================================
+   🛡️ ROOT WORKSPACE CONFIGURATION: Dependency Resolution Strategy Override
+   ========================================================================== */
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            // Forces Gradle to safely downgrade the security jar file to a stable version
+            force 'org.bouncycastle:bcprov-jdk18on:1.74'
+            
+            // Forces Gradle to ignore caching and use the fixed version immediately
+            cacheChangingModulesFor 0, 'seconds'
+        }
+    }
+}
